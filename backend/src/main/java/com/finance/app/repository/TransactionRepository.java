@@ -10,5 +10,6 @@ import java.util.List;
 @Repository
 public interface TransactionRepository extends MongoRepository<Transaction, String> {
     List<Transaction> findAllByUsernameOrderByDateDesc(String username);
-    List<Transaction> findByUsernameAndDateBetweenOrderByDateDesc(String username, LocalDate startDate, LocalDate endDate);
+    @org.springframework.data.mongodb.repository.Query("{ 'username': ?0, 'date': { $gte: ?1, $lte: ?2 } }")
+    List<Transaction> findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(String username, LocalDate startDate, LocalDate endDate);
 }

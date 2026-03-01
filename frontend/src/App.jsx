@@ -1,10 +1,11 @@
 import { BrowserRouter, Routes, Route, NavLink, Navigate, useNavigate } from 'react-router-dom';
-import { FiHome, FiCalendar, FiBarChart2, FiList, FiTarget, FiLogOut } from 'react-icons/fi';
+import { FiHome, FiCalendar, FiBarChart2, FiList, FiTarget, FiLogOut, FiRepeat, FiTrendingUp } from 'react-icons/fi';
 import Dashboard from './pages/Dashboard';
 import WeeklyReport from './pages/WeeklyReport';
 import MonthlyReport from './pages/MonthlyReport';
 import Transactions from './pages/Transactions';
-import Budgets from './pages/Budgets';
+import RecurringTransactions from './pages/RecurringTransactions';
+import FutureTrends from './pages/FutureTrends';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 
@@ -31,7 +32,8 @@ function Sidebar() {
     { to: '/weekly', icon: <FiCalendar />, label: 'Weekly Report' },
     { to: '/monthly', icon: <FiBarChart2 />, label: 'Monthly Report' },
     { to: '/transactions', icon: <FiList />, label: 'Transactions' },
-    { to: '/budgets', icon: <FiTarget />, label: 'Budgets' },
+    { to: '/recurring-transactions', icon: <FiRepeat />, label: 'Recurring' },
+    { to: '/future-trends', icon: <FiTrendingUp />, label: 'Future Trends' },
   ];
 
   return (
@@ -88,7 +90,8 @@ function MainLayout() {
             <Route path="/weekly" element={<WeeklyReport />} />
             <Route path="/monthly" element={<MonthlyReport />} />
             <Route path="/transactions" element={<Transactions />} />
-            <Route path="/budgets" element={<Budgets />} />
+            <Route path="/recurring-transactions" element={<RecurringTransactions />} />
+            <Route path="/future-trends" element={<FutureTrends />} />
           </Routes>
         </div>
       </div>

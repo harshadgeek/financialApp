@@ -39,7 +39,7 @@ public class BudgetController {
         LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
         LocalDate effectiveEnd = end.isAfter(now) ? now : end;
 
-        List<Transaction> monthTx = transactionRepository.findByUsernameAndDateBetweenOrderByDateDesc(username, start, effectiveEnd);
+        List<Transaction> monthTx = transactionRepository.findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(username, start, effectiveEnd);
         Map<Category, BigDecimal> spendMap = monthTx.stream()
                 .filter(t -> t.getType() == TransactionType.EXPENSE)
                 .collect(Collectors.groupingBy(

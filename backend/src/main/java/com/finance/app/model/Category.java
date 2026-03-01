@@ -2,6 +2,7 @@ package com.finance.app.model;
 
 public enum Category {
     SALARY,
+    RENT,
     FOOD,
     TRANSPORT,
     ENTERTAINMENT,
@@ -9,5 +10,6 @@ public enum Category {
     HEALTH,
     SHOPPING,
     EDUCATION,
+    INVESTMENT,
     OTHER
 }

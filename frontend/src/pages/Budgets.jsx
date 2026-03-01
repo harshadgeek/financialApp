@@ -7,13 +7,13 @@ const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'Ju
 
 const CATEGORY_ICONS = {
     FOOD: '🍔', TRANSPORT: '🚗', ENTERTAINMENT: '🎬', UTILITIES: '💡',
-    HEALTH: '💊', SHOPPING: '🛍️', EDUCATION: '📚', OTHER: '📦', SALARY: '💼'
+    HEALTH: '💊', SHOPPING: '🛍️', EDUCATION: '📚', OTHER: '📦', SALARY: '💼', RENT: '🏠'
 };
 
 const CATEGORY_COLORS = {
     FOOD: '#34d399', TRANSPORT: '#4f8ef7', ENTERTAINMENT: '#a78bfa',
     UTILITIES: '#fbbf24', HEALTH: '#f87171', SHOPPING: '#22d3ee',
-    EDUCATION: '#f97316', OTHER: '#94a3b8'
+    EDUCATION: '#f97316', OTHER: '#94a3b8', RENT: '#f43f5e'
 };
 
 export default function Budgets() {

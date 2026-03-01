@@ -1,6 +1,7 @@
 package com.finance.app.controller;
 
 import com.finance.app.dto.DashboardSummaryDto;
+import com.finance.app.dto.FutureProjectionDto;
 import com.finance.app.dto.MonthlyReportDto;
 import com.finance.app.dto.WeeklyReportDto;
 import com.finance.app.service.ReportService;
@@ -35,5 +36,12 @@ public class ReportController {
         int m = month == 0 ? now.getMonthValue() : month;
         int y = year == 0 ? now.getYear() : year;
         return reportService.getMonthlyReport(principal.getName(), m, y);
+    }
+
+    @GetMapping("/future-projection")
+    public FutureProjectionDto getFutureProjection(
+            @RequestParam String targetDate,
+            Principal principal) {
+        return reportService.getFutureProjection(principal.getName(), LocalDate.parse(targetDate));
     }
 }

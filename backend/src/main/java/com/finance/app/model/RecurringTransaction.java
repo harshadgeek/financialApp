@@ -10,12 +10,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Document(collection = "transactions")
+@Document(collection = "recurring_transactions")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Transaction {
+public class RecurringTransaction {
 
     @Id
     private String id;
@@ -24,8 +24,13 @@ public class Transaction {
     private TransactionType type;
     private Category category;
     private String description;
-    private LocalDate date;
+    
+    private RecurringFrequency frequency;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private LocalDate nextExecutionDate;
+    private boolean active;
     
     @org.springframework.data.mongodb.core.index.Indexed
-    private String username; // The user this transaction belongs to
+    private String username;
 }

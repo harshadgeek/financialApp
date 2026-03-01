@@ -27,6 +27,11 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.addTransaction(transaction));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Transaction> updateTransaction(@PathVariable String id, @RequestBody Transaction transaction, Principal principal) {
+        return ResponseEntity.ok(transactionService.updateTransaction(id, transaction, principal.getName()));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTransaction(@PathVariable String id, Principal principal) {
         transactionService.deleteTransaction(id, principal.getName());

@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:8080/api';
+const port = import.meta.env.VITE_BACKEND_PORT || 8080;
+const API_BASE = `http://localhost:${port}/api`;
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -29,7 +30,12 @@ export const getMonthlyReport = (month, year) => api.get('/reports/monthly', { p
 
 export const getTransactions = () => api.get('/transactions').then(r => r.data);
 export const addTransaction = (txn) => api.post('/transactions', txn).then(r => r.data);
+export const updateTransaction = (id, txn) => api.put(`/transactions/${id}`, txn).then(r => r.data);
 export const deleteTransaction = (id) => api.delete(`/transactions/${id}`);
 
-export const getBudgets = (month, year) => api.get('/budgets', { params: { month, year } }).then(r => r.data);
-export const upsertBudget = (budget) => api.post('/budgets', budget).then(r => r.data);
+export const getRecurringTransactions = () => api.get('/recurring-transactions').then(r => r.data);
+export const addRecurringTransaction = (txn) => api.post('/recurring-transactions', txn).then(r => r.data);
+export const updateRecurringTransaction = (id, txn) => api.put(`/recurring-transactions/${id}`, txn).then(r => r.data);
+export const deleteRecurringTransaction = (id) => api.delete(`/recurring-transactions/${id}`);
+
+export const getFutureProjection = (targetDate) => api.get('/reports/future-projection', { params: { targetDate } }).then(r => r.data);

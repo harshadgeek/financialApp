@@ -22,6 +22,19 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
+    public Transaction updateTransaction(String id, Transaction transaction, String username) {
+        Transaction existing = getById(id);
+        if (!existing.getUsername().equals(username)) {
+            throw new RuntimeException("Unauthorized");
+        }
+        existing.setAmount(transaction.getAmount());
+        existing.setCategory(transaction.getCategory());
+        existing.setDescription(transaction.getDescription());
+        existing.setDate(transaction.getDate());
+        existing.setType(transaction.getType());
+        return transactionRepository.save(existing);
+    }
+
     public void deleteTransaction(String id, String username) {
         Transaction tx = getById(id);
         if (!tx.getUsername().equals(username)) {

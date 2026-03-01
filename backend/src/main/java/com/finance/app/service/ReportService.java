@@ -1,12 +1,17 @@
 package com.finance.app.service;
 
 import com.finance.app.dto.DashboardSummaryDto;
+import com.finance.app.dto.FutureProjectionDto;
 import com.finance.app.dto.MonthlyReportDto;
 import com.finance.app.dto.WeeklyReportDto;
+import com.finance.app.model.RecurringFrequency;
+import com.finance.app.model.RecurringTransaction;
 import com.finance.app.model.Transaction;
 import com.finance.app.model.TransactionType;
+import com.finance.app.repository.RecurringTransactionRepository;
 import com.finance.app.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,9 +24,11 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReportService {
 
     private final TransactionRepository transactionRepository;
+    private final RecurringTransactionRepository recurringTransactionRepository;
 
     // ─── Dashboard ────────────────────────────────────────────────────────────
 
@@ -29,7 +36,7 @@ public class ReportService {
         LocalDate today = LocalDate.now();
         LocalDate start = today.minusMonths(5).withDayOfMonth(1);
 
-        List<Transaction> all = transactionRepository.findByUsernameAndDateBetweenOrderByDateDesc(username, start, today);
+        List<Transaction> all = transactionRepository.findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(username, start, today);
 
         BigDecimal totalIncome = sumByType(all, TransactionType.INCOME);
         BigDecimal totalExpenses = sumByType(all, TransactionType.EXPENSE);
@@ -43,7 +50,7 @@ public class ReportService {
         for (int i = 5; i >= 0; i--) {
             LocalDate mStart = today.withDayOfMonth(1).minusMonths(i);
             LocalDate mEnd = i == 0 ? today : mStart.withDayOfMonth(mStart.lengthOfMonth());
-            List<Transaction> monthTx = transactionRepository.findByUsernameAndDateBetweenOrderByDateDesc(username, mStart, mEnd);
+            List<Transaction> monthTx = transactionRepository.findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(username, mStart, mEnd);
             trend.add(new DashboardSummaryDto.MonthlyTrendDto(
                     mStart.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH),
                     sumByType(monthTx, TransactionType.INCOME),
@@ -53,7 +60,7 @@ public class ReportService {
 
         // Expense by category (current month)
         LocalDate thisMonthStart = today.withDayOfMonth(1);
-        List<Transaction> thisMonth = transactionRepository.findByUsernameAndDateBetweenOrderByDateDesc(username, thisMonthStart, today);
+        List<Transaction> thisMonth = transactionRepository.findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(username, thisMonthStart, today);
         Map<String, BigDecimal> byCategory = thisMonth.stream()
                 .filter(t -> t.getType() == TransactionType.EXPENSE)
                 .collect(Collectors.groupingBy(
@@ -78,7 +85,7 @@ public class ReportService {
         LocalDate weekStart = today.with(DayOfWeek.MONDAY);
         LocalDate weekEnd = weekStart.plusDays(6);
 
-        List<Transaction> weekTx = transactionRepository.findByUsernameAndDateBetweenOrderByDateDesc(username, weekStart, weekEnd);
+        List<Transaction> weekTx = transactionRepository.findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(username, weekStart, weekEnd);
 
         List<WeeklyReportDto.DailyDataDto> daily = new ArrayList<>();
         for (int d = 0; d < 7; d++) {
@@ -120,7 +127,7 @@ public class ReportService {
         LocalDate today = LocalDate.now();
         LocalDate effectiveEnd = end.isAfter(today) ? today : end;
 
-        List<Transaction> monthTx = transactionRepository.findByUsernameAndDateBetweenOrderByDateDesc(username, start, effectiveEnd);
+        List<Transaction> monthTx = transactionRepository.findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(username, start, effectiveEnd);
 
         BigDecimal totalIncome = sumByType(monthTx, TransactionType.INCOME);
         BigDecimal totalExpenses = sumByType(monthTx, TransactionType.EXPENSE);
@@ -175,6 +182,106 @@ public class ReportService {
                 byCategory,
                 runningTotals
         );
+    }
+
+    public FutureProjectionDto getFutureProjection(String username, LocalDate targetDate) {
+        log.info("Calculating future projection for user: {} up to {}", username, targetDate);
+        LocalDate today = LocalDate.now();
+        if (targetDate.isBefore(today)) targetDate = today.plusMonths(1);
+
+        // 1. Current Balance
+        List<Transaction> allHistory = transactionRepository.findAllByUsernameOrderByDateDesc(username);
+        BigDecimal currentBalance = allHistory.stream()
+                .filter(t -> t.getAmount() != null)
+                .map(t -> t.getType() == TransactionType.INCOME ? t.getAmount() : t.getAmount().negate())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        log.debug("Current balance for {}: {}", username, currentBalance);
+
+        // 2. Projections
+        List<RecurringTransaction> actives = recurringTransactionRepository.findAllByUsername(username).stream()
+                .filter(rt -> rt != null && rt.isActive() && rt.getAmount() != null && rt.getFrequency() != null)
+                .collect(Collectors.toList());
+
+        log.debug("Found {} active recurring transactions for {}", actives.size(), username);
+
+        BigDecimal totalProjectedIncome = BigDecimal.ZERO;
+        BigDecimal totalProjectedExpenses = BigDecimal.ZERO;
+        List<FutureProjectionDto.ProjectedDataPointDto> trend = new ArrayList<>();
+
+        // We'll iterate day by day to build the trend line
+        BigDecimal runningBalance = currentBalance;
+        
+        // Add start point
+        trend.add(new FutureProjectionDto.ProjectedDataPointDto(today.toString(), runningBalance, BigDecimal.ZERO, BigDecimal.ZERO));
+
+        for (LocalDate date = today.plusDays(1); !date.isAfter(targetDate); date = date.plusDays(1)) {
+            BigDecimal dayIncome = BigDecimal.ZERO;
+            BigDecimal dayExpense = BigDecimal.ZERO;
+
+            for (RecurringTransaction rt : actives) {
+                if (isExecutingOn(rt, date)) {
+                    if (rt.getType() == TransactionType.INCOME) {
+                        dayIncome = dayIncome.add(rt.getAmount());
+                    } else {
+                        dayExpense = dayExpense.add(rt.getAmount());
+                    }
+                }
+            }
+
+            if (dayIncome.compareTo(BigDecimal.ZERO) > 0 || dayExpense.compareTo(BigDecimal.ZERO) > 0) {
+                totalProjectedIncome = totalProjectedIncome.add(dayIncome);
+                totalProjectedExpenses = totalProjectedExpenses.add(dayExpense);
+                runningBalance = runningBalance.add(dayIncome).subtract(dayExpense);
+                
+                trend.add(new FutureProjectionDto.ProjectedDataPointDto(
+                        date.toString(),
+                        runningBalance,
+                        dayIncome,
+                        dayExpense
+                ));
+            }
+        }
+
+        // Add final point if not already there
+        if (trend.get(trend.size()-1).getDate().equals(targetDate.toString())) {
+             // already added
+        } else {
+             trend.add(new FutureProjectionDto.ProjectedDataPointDto(targetDate.toString(), runningBalance, BigDecimal.ZERO, BigDecimal.ZERO));
+        }
+
+        return new FutureProjectionDto(
+                currentBalance,
+                totalProjectedIncome,
+                totalProjectedExpenses,
+                runningBalance,
+                trend
+        );
+    }
+
+    private boolean isExecutingOn(RecurringTransaction rt, LocalDate date) {
+        if (rt == null || rt.getFrequency() == null) return false;
+        if (rt.getStartDate() != null && date.isBefore(rt.getStartDate())) return false;
+        if (rt.getEndDate() != null && date.isAfter(rt.getEndDate())) return false;
+        
+        // This is a simplified projection. A robust one would handle every execution date correctly.
+        // For projection, we calculate if 'date' is a multiple of frequency from 'startDate'
+        LocalDate current = rt.getStartDate() != null ? rt.getStartDate() : LocalDate.now();
+        
+        // To avoid infinite loops or heavy computation, we use logic based on frequency
+        try {
+            switch (rt.getFrequency()) {
+                case DAILY: return true;
+                case WEEKLY: return current.getDayOfWeek() == date.getDayOfWeek();
+                case MONTHLY: return current.getDayOfMonth() == date.getDayOfMonth() || 
+                                    (date.getDayOfMonth() == date.lengthOfMonth() && current.getDayOfMonth() > date.lengthOfMonth());
+                case YEARLY: return current.getMonth() == date.getMonth() && current.getDayOfMonth() == date.getDayOfMonth();
+                default: return false;
+            }
+        } catch (Exception e) {
+            log.warn("Error checking execution for recurring tx: {}", rt.getId(), e);
+            return false;
+        }
     }
 
     // ─── Helper ───────────────────────────────────────────────────────────────
