@@ -46,3 +46,12 @@ export const uploadProfilePicture = (formData) => api.post('/users/profile-pictu
   headers: { 'Content-Type': 'multipart/form-data' }
 }).then(r => r.data);
 
+// Budgets
+export const getBudgets = () => api.get('/budgets').then(r => r.data);
+export const upsertBudget = (category, monthlyLimit) => api.post('/budgets', { category, monthlyLimit }).then(r => r.data);
+export const deleteBudget = (category) => api.delete(`/budgets/${category}`);
+export const getBudgetStatus = (month, year) => api.get('/budgets/status', { params: { month, year } }).then(r => r.data);
+
+// Account
+export const changePassword = (currentPassword, newPassword) =>
+  api.post('/users/change-password', { currentPassword, newPassword }).then(r => r.data);

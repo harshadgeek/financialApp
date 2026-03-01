@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { FiTrash2, FiPlus, FiEdit2, FiDownload, FiFileText } from 'react-icons/fi';
+import { useEffect, useState, useCallback } from 'react';
+import { FiTrash2, FiPlus, FiEdit2, FiDownload, FiFileText, FiSearch, FiX } from 'react-icons/fi';
 import { getTransactions, addTransaction, updateTransaction, deleteTransaction } from '../api';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -20,6 +20,20 @@ export default function Transactions() {
     const [submitting, setSubmitting] = useState(false);
     const [filterType, setFilterType] = useState('ALL');
     const [editingId, setEditingId] = useState(null);
+    const [search, setSearch] = useState('');
+    const [filterCategory, setFilterCategory] = useState('ALL');
+    const [dateFrom, setDateFrom] = useState('');
+    const [dateTo, setDateTo] = useState('');
+    const [amountMin, setAmountMin] = useState('');
+    const [amountMax, setAmountMax] = useState('');
+
+    const clearFilters = () => {
+        setSearch(''); setFilterCategory('ALL');
+        setDateFrom(''); setDateTo('');
+        setAmountMin(''); setAmountMax('');
+        setFilterType('ALL');
+    };
+    const hasActiveFilters = search || filterCategory !== 'ALL' || dateFrom || dateTo || amountMin || amountMax || filterType !== 'ALL';
 
     const load = () => {
         setLoading(true);
@@ -66,7 +80,19 @@ export default function Transactions() {
         load();
     };
 
-    const filtered = filterType === 'ALL' ? transactions : transactions.filter(t => t.type === filterType);
+    const filtered = transactions.filter(t => {
+        if (filterType !== 'ALL' && t.type !== filterType) return false;
+        if (filterCategory !== 'ALL' && t.category !== filterCategory) return false;
+        if (search) {
+            const q = search.toLowerCase();
+            if (!t.description?.toLowerCase().includes(q) && !t.category.toLowerCase().includes(q)) return false;
+        }
+        if (dateFrom && t.date < dateFrom) return false;
+        if (dateTo && t.date > dateTo) return false;
+        if (amountMin && Number(t.amount) < Number(amountMin)) return false;
+        if (amountMax && Number(t.amount) > Number(amountMax)) return false;
+        return true;
+    });
 
     const exportToPdf = () => {
         const doc = new jsPDF();
@@ -244,16 +270,51 @@ export default function Transactions() {
                 </div>
             )}
 
-            {/* Filter */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-                {['ALL', 'INCOME', 'EXPENSE'].map(f => (
-                    <button key={f} onClick={() => setFilterType(f)}
-                        className={`btn btn-sm ${filterType === f ? 'btn-primary' : 'btn-ghost'}`}>
-                        {f === 'ALL' ? 'All' : f === 'INCOME' ? '↑ Income' : '↓ Expenses'}
+            {/* Filters */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16, alignItems: 'flex-end' }}>
+                {/* Keyword search */}
+                <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 160 }}>
+                    <FiSearch size={13} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                    <input
+                        className="form-input" type="text" placeholder="Search description / category…"
+                        value={search} onChange={e => setSearch(e.target.value)}
+                        style={{ paddingLeft: 30, fontSize: '0.82rem' }}
+                    />
+                </div>
+                {/* Category */}
+                <select className="form-select" value={filterCategory} onChange={e => setFilterCategory(e.target.value)}
+                    style={{ flex: '0 1 140px', fontSize: '0.82rem', padding: '7px 10px' }}>
+                    <option value="ALL">All Categories</option>
+                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                {/* Type pills */}
+                <div style={{ display: 'flex', gap: 6 }}>
+                    {['ALL', 'INCOME', 'EXPENSE'].map(f => (
+                        <button key={f} onClick={() => setFilterType(f)}
+                            className={`btn btn-sm ${filterType === f ? 'btn-primary' : 'btn-ghost'}`}>
+                            {f === 'ALL' ? 'All' : f === 'INCOME' ? '↑ Income' : '↓ Expenses'}
+                        </button>
+                    ))}
+                </div>
+            </div>
+            {/* Date & Amount row */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20, alignItems: 'center' }}>
+                <input className="form-input" type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
+                    style={{ flex: '0 1 150px', fontSize: '0.82rem', padding: '7px 10px' }} title="From date" />
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>to</span>
+                <input className="form-input" type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
+                    style={{ flex: '0 1 150px', fontSize: '0.82rem', padding: '7px 10px' }} title="To date" />
+                <input className="form-input" type="number" placeholder="Min ₹" value={amountMin} onChange={e => setAmountMin(e.target.value)}
+                    style={{ flex: '0 1 100px', fontSize: '0.82rem', padding: '7px 10px' }} min="0" />
+                <input className="form-input" type="number" placeholder="Max ₹" value={amountMax} onChange={e => setAmountMax(e.target.value)}
+                    style={{ flex: '0 1 100px', fontSize: '0.82rem', padding: '7px 10px' }} min="0" />
+                {hasActiveFilters && (
+                    <button className="btn btn-ghost btn-sm" onClick={clearFilters} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <FiX size={13} /> Clear
                     </button>
-                ))}
-                <span style={{ marginLeft: 'auto', color: 'var(--text-muted)', fontSize: '0.85rem', alignSelf: 'center' }}>
-                    {filtered.length} records
+                )}
+                <span style={{ marginLeft: 'auto', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                    {filtered.length} record{filtered.length !== 1 ? 's' : ''}
                 </span>
             </div>
 

@@ -3,8 +3,8 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, Legend
 } from 'recharts';
-import { FiArrowUpRight, FiArrowDownRight, FiDollarSign, FiPercent } from 'react-icons/fi';
-import { getDashboard, getTransactions } from '../api';
+import { FiArrowUpRight, FiArrowDownRight, FiDollarSign, FiPercent, FiAlertCircle, FiX } from 'react-icons/fi';
+import { getDashboard, getTransactions, getBudgetStatus } from '../api';
 import { useCurrency } from '../context/CurrencyContext.jsx';
 
 const CustomTooltip = ({ active, payload, label, fmt }) => {
@@ -29,12 +29,27 @@ export default function Dashboard() {
     const [recentTx, setRecentTx] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [budgetAlerts, setBudgetAlerts] = useState([]);
+    const [alertDismissed, setAlertDismissed] = useState(false);
 
-    useEffect(() => {
-        Promise.all([getDashboard(), getTransactions()])
-            .then(([dash, txs]) => { setData(dash); setRecentTx(txs.slice(0, 8)); })
+    const loadAll = () => {
+        setLoading(true);
+        setAlertDismissed(false);
+        Promise.all([getDashboard(), getTransactions(), getBudgetStatus()])
+            .then(([dash, txs, statuses]) => {
+                setData(dash);
+                setRecentTx(txs.slice(0, 8));
+                setBudgetAlerts(statuses.filter(s => s.status === 'OVER' || s.status === 'WARNING'));
+            })
             .catch(() => setError('Failed to load dashboard data. Is the backend running?'))
             .finally(() => setLoading(false));
+    };
+
+    useEffect(() => {
+        loadAll();
+        const handler = () => loadAll();
+        window.addEventListener('financeiq:transaction-added', handler);
+        return () => window.removeEventListener('financeiq:transaction-added', handler);
     }, []);
 
     if (loading) return <div className="loading-state"><div className="spinner" /><p>Loading dashboard…</p></div>;
@@ -54,6 +69,30 @@ export default function Dashboard() {
                     Last 6 Months
                 </span>
             </div>
+
+            {/* Budget Alert Banner */}
+            {!alertDismissed && budgetAlerts.length > 0 && (
+                <div style={{
+                    display: 'flex', alignItems: 'flex-start', gap: 12,
+                    background: budgetAlerts.some(a => a.status === 'OVER') ? 'rgba(248,113,113,0.1)' : 'rgba(251,191,36,0.08)',
+                    border: `1px solid ${budgetAlerts.some(a => a.status === 'OVER') ? 'rgba(248,113,113,0.35)' : 'rgba(251,191,36,0.3)'}`,
+                    borderRadius: 10, padding: '12px 16px', marginBottom: 20
+                }}>
+                    <FiAlertCircle size={16} style={{ marginTop: 2, flexShrink: 0, color: budgetAlerts.some(a => a.status === 'OVER') ? 'var(--danger)' : '#fbbf24' }} />
+                    <div style={{ flex: 1 }}>
+                        <span style={{ fontWeight: 600, fontSize: '0.88rem', color: budgetAlerts.some(a => a.status === 'OVER') ? 'var(--danger)' : '#fbbf24' }}>
+                            {budgetAlerts.some(a => a.status === 'OVER') ? 'Budget Exceeded' : 'Budget Warning'}
+                        </span>
+                        <span style={{ color: 'var(--text-secondary)', fontSize: '0.83rem', marginLeft: 8 }}>
+                            {budgetAlerts.map(a => `${a.category} (${Math.round((Number(a.spent) / Number(a.monthlyLimit)) * 100)}%)`).join(' · ')}
+                        </span>
+                    </div>
+                    <button onClick={() => setAlertDismissed(true)}
+                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 2 }}>
+                        <FiX size={14} />
+                    </button>
+                </div>
+            )}
 
             {/* KPI Cards */}
             <div className="kpi-grid">

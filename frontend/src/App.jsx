@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, NavLink, Navigate, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
-import { FiHome, FiCalendar, FiBarChart2, FiList, FiTarget, FiLogOut, FiRepeat, FiTrendingUp, FiRefreshCw } from 'react-icons/fi';
+import { FiHome, FiCalendar, FiBarChart2, FiList, FiTarget, FiLogOut, FiRepeat, FiTrendingUp, FiRefreshCw, FiPlus, FiLock } from 'react-icons/fi';
 import { getUserProfile, uploadProfilePicture } from './api';
 import { useCurrency, CURRENCIES } from './context/CurrencyContext.jsx';
 import Dashboard from './pages/Dashboard';
@@ -9,8 +9,11 @@ import MonthlyReport from './pages/MonthlyReport';
 import Transactions from './pages/Transactions';
 import RecurringTransactions from './pages/RecurringTransactions';
 import FutureTrends from './pages/FutureTrends';
+import Budgets from './pages/Budgets';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
+import QuickAddModal from './components/QuickAddModal';
+import ChangePasswordModal from './components/ChangePasswordModal';
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('financeiq_token');
@@ -27,6 +30,7 @@ function Sidebar() {
   const { currency, setCurrency, rate, rateLoading, rateError, lastUpdated, refreshRate } = useCurrency();
   const fileInputRef = useRef(null);
   const [profile, setProfile] = useState(null);
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const username = localStorage.getItem('financeiq_username') || 'User';
 
   useEffect(() => {
@@ -68,6 +72,7 @@ function Sidebar() {
     { to: '/transactions', icon: <FiList />, label: 'Transactions' },
     { to: '/recurring-transactions', icon: <FiRepeat />, label: 'Recurring' },
     { to: '/future-trends', icon: <FiTrendingUp />, label: 'Future Trends' },
+    { to: '/budgets', icon: <FiTarget />, label: 'Budgets' },
   ];
 
   const backendPort = import.meta.env.VITE_BACKEND_PORT || 8080;
@@ -160,18 +165,39 @@ function Sidebar() {
               <div className="user-role">Personal</div>
             </div>
           </div>
-          <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 8 }}>
-            <FiLogOut size={18} />
-          </button>
+          <div style={{ display: 'flex', gap: 2 }}>
+            <button onClick={() => setShowChangePassword(true)} title="Change Password" style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 8 }}>
+              <FiLock size={16} />
+            </button>
+            <button onClick={handleLogout} title="Logout" style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: 8 }}>
+              <FiLogOut size={16} />
+            </button>
+          </div>
         </div>
       </div>
+
+      {showChangePassword && <ChangePasswordModal onClose={() => setShowChangePassword(false)} />}
     </aside>
   );
 }
 
+
 function MainLayout() {
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
+
   return (
     <div className="app-layout">
+      <style>{`
+        @keyframes fadeSlideIn {
+          from { opacity: 0; transform: translate(-50%, -54%); }
+          to   { opacity: 1; transform: translate(-50%, -50%); }
+        }
+        @keyframes fabPop {
+          0%   { transform: scale(1); }
+          40%  { transform: scale(1.12); }
+          100% { transform: scale(1); }
+        }
+      `}</style>
       <Sidebar />
       <div className="main-content">
         <div className="page-content">
@@ -182,9 +208,32 @@ function MainLayout() {
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/recurring-transactions" element={<RecurringTransactions />} />
             <Route path="/future-trends" element={<FutureTrends />} />
+            <Route path="/budgets" element={<Budgets />} />
           </Routes>
         </div>
       </div>
+
+      {/* Floating Action Button */}
+      <button
+        onClick={() => setShowQuickAdd(true)}
+        title="Quick add transaction"
+        style={{
+          position: 'fixed', bottom: 32, right: 32,
+          width: 54, height: 54, borderRadius: '50%',
+          background: 'linear-gradient(135deg, #4f8ef7, #7c5cf7)',
+          border: 'none', color: '#fff', cursor: 'pointer',
+          boxShadow: '0 6px 24px rgba(79,142,247,0.45)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '1.5rem', zIndex: 900,
+          transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(79,142,247,0.6)'; }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(79,142,247,0.45)'; }}
+      >
+        <FiPlus size={24} />
+      </button>
+
+      {showQuickAdd && <QuickAddModal onClose={() => setShowQuickAdd(false)} />}
     </div>
   );
 }

@@ -69,6 +69,22 @@ public class UserController {
         }
     }
 
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            @RequestBody java.util.Map<String, String> body,
+            Authentication authentication) {
+        try {
+            userService.changePassword(
+                    authentication.getName(),
+                    body.get("currentPassword"),
+                    body.get("newPassword")
+            );
+            return ResponseEntity.ok("Password changed successfully.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     private String getFileExtension(String fileName) {
         if (fileName == null || fileName.lastIndexOf(".") == -1) {
             return ".jpg"; // Default

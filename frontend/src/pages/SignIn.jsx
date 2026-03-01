@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../api';
-import { FiLock, FiUser } from 'react-icons/fi';
+import { FiLock, FiUser, FiAlertCircle } from 'react-icons/fi';
 
 export default function SignIn() {
     const navigate = useNavigate();
     const [form, setForm] = useState({ username: '', password: '' });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [shake, setShake] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -19,7 +20,13 @@ export default function SignIn() {
             localStorage.setItem('financeiq_username', res.data.username);
             navigate('/');
         } catch (err) {
-            setError(err.response?.data || 'Failed to sign in. Please check your credentials.');
+            const msg =
+                typeof err.response?.data === 'string' ? err.response.data :
+                    err.response?.data?.message || err.response?.data?.error ||
+                    'Invalid username or password. Please try again.';
+            setError(msg);
+            setShake(true);
+            setTimeout(() => setShake(false), 600);
         } finally {
             setLoading(false);
         }
@@ -27,7 +34,14 @@ export default function SignIn() {
 
     return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-main)' }}>
-            <div className="card" style={{ width: 400, padding: 40 }}>
+            <style>{`
+                @keyframes shake {
+                    0%,100% { transform: translateX(0); }
+                    20%,60% { transform: translateX(-8px); }
+                    40%,80% { transform: translateX(8px); }
+                }
+            `}</style>
+            <div className="card" style={{ width: 400, padding: 40, animation: shake ? 'shake 0.5s ease' : 'none' }}>
                 <div style={{ textAlign: 'center', marginBottom: 30 }}>
                     <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
                         finance<span style={{ color: 'var(--accent)' }}>iq</span>
@@ -36,7 +50,14 @@ export default function SignIn() {
                 </div>
 
                 {error && (
-                    <div style={{ padding: 12, borderRadius: 8, background: 'rgba(248, 113, 113, 0.1)', color: 'var(--danger)', marginBottom: 20, textAlign: 'center', fontSize: 14 }}>
+                    <div style={{
+                        display: 'flex', alignItems: 'center', gap: 8,
+                        padding: '10px 14px', borderRadius: 8,
+                        background: 'rgba(248, 113, 113, 0.12)',
+                        border: '1px solid rgba(248, 113, 113, 0.3)',
+                        color: 'var(--danger)', marginBottom: 20, fontSize: 14
+                    }}>
+                        <FiAlertCircle size={15} style={{ flexShrink: 0 }} />
                         {error}
                     </div>
                 )}
