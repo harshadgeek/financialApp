@@ -118,4 +118,4 @@ Project your future balance based on current recurring transactions. Pick a targ
 | GET | `/api/users/profile` | Get user profile | 🔒 |
 | POST | `/api/users/profile-picture` | Upload profile picture | 🔒 |
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=harshadgeek_financialApp&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=harshadgeek_financialApp)
+[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=harshadgeek_financialApp)
