@@ -24,10 +24,10 @@ public class UserService implements UserDetailsService {
 
     public User registerUser(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username())) {
-            throw new RuntimeException("Error: Username is already taken!");
+            throw new IllegalArgumentException("Error: Username is already taken!");
         }
         if (userRepository.existsByEmail(request.email())) {
-            throw new RuntimeException("Error: Email is already in use!");
+            throw new IllegalArgumentException("Error: Email is already in use!");
         }
 
         User user = User.builder()
@@ -69,10 +69,10 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            throw new RuntimeException("Current password is incorrect.");
+            throw new IllegalArgumentException("Current password is incorrect.");
         }
         if (newPassword.length() < 6) {
-            throw new RuntimeException("New password must be at least 6 characters.");
+            throw new IllegalArgumentException("New password must be at least 6 characters.");
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));

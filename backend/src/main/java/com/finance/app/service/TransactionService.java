@@ -25,7 +25,7 @@ public class TransactionService {
     public Transaction updateTransaction(String id, Transaction transaction, String username) {
         Transaction existing = getById(id);
         if (!existing.getUsername().equals(username)) {
-            throw new RuntimeException("Unauthorized");
+            throw new SecurityException("Unauthorized");
         }
         existing.setAmount(transaction.getAmount());
         existing.setCategory(transaction.getCategory());
@@ -38,13 +38,13 @@ public class TransactionService {
     public void deleteTransaction(String id, String username) {
         Transaction tx = getById(id);
         if (!tx.getUsername().equals(username)) {
-            throw new RuntimeException("Unauthorized");
+            throw new SecurityException("Unauthorized");
         }
         transactionRepository.deleteById(id);
     }
 
     public Transaction getById(String id) {
         return transactionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transaction not found: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + id));
     }
 }

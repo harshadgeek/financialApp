@@ -15,11 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.format.TextStyle;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -278,7 +278,7 @@ public class ReportService {
                 case YEARLY: return current.getMonth() == date.getMonth() && current.getDayOfMonth() == date.getDayOfMonth();
                 default: return false;
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.warn("Error checking execution for recurring tx: {}", rt.getId(), e);
             return false;
         }

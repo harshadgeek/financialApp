@@ -34,7 +34,7 @@ public class AuthController {
             String token = jwtUtil.generateToken(userDetails);
             
             return ResponseEntity.ok(new AuthResponse(token, request.username()));
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -45,7 +45,7 @@ public class AuthController {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.username(), request.password())
             );
-        } catch (Exception e) {
+        } catch (org.springframework.security.core.AuthenticationException e) {
             return ResponseEntity.status(401).body("Invalid username or password. Please try again.");
         }
 

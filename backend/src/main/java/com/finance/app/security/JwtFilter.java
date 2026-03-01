@@ -37,7 +37,7 @@ public class JwtFilter extends OncePerRequestFilter {
             jwt = authorizationHeader.substring(7);
             try {
                 username = jwtUtil.extractUsername(jwt);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 // Ignore invalid token
             }
         }

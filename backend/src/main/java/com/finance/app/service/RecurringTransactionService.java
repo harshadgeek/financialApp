@@ -38,9 +38,9 @@ public class RecurringTransactionService {
 
     public RecurringTransaction update(String id, RecurringTransaction req, String username) {
         RecurringTransaction existing = recurringTransactionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Not found"));
         if (!existing.getUsername().equals(username)) {
-            throw new RuntimeException("Unauthorized");
+            throw new SecurityException("Unauthorized");
         }
         
         // Merge fields
@@ -65,9 +65,9 @@ public class RecurringTransactionService {
 
     public void delete(String id, String username) {
         RecurringTransaction tx = recurringTransactionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Not found"));
         if (!tx.getUsername().equals(username)) {
-            throw new RuntimeException("Unauthorized");
+            throw new SecurityException("Unauthorized");
         }
         recurringTransactionRepository.deleteById(id);
     }
