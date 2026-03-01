@@ -5,12 +5,9 @@ import {
 } from 'recharts';
 import { FiArrowUpRight, FiArrowDownRight, FiDollarSign, FiPercent } from 'react-icons/fi';
 import { getDashboard, getTransactions } from '../api';
+import { useCurrency } from '../context/CurrencyContext.jsx';
 
-const PIE_COLORS = ['#4f8ef7', '#a78bfa', '#34d399', '#f87171', '#fbbf24', '#22d3ee', '#f97316', '#e879f9'];
-
-const fmt = v => `₹${Number(v).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload, label, fmt }) => {
     if (!active || !payload?.length) return null;
     return (
         <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '12px 16px' }}>
@@ -24,7 +21,10 @@ const CustomTooltip = ({ active, payload, label }) => {
     );
 };
 
+const PIE_COLORS = ['#4f8ef7', '#a78bfa', '#34d399', '#f87171', '#fbbf24', '#22d3ee', '#f97316', '#e879f9'];
+
 export default function Dashboard() {
+    const { fmt, fmtAxis } = useCurrency();
     const [data, setData] = useState(null);
     const [recentTx, setRecentTx] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -82,8 +82,8 @@ export default function Dashboard() {
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                             <XAxis dataKey="month" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
-                            <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `₹${v / 1000}k`} />
-                            <Tooltip content={<CustomTooltip />} />
+                            <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={fmtAxis} />
+                            <Tooltip content={(props) => <CustomTooltip {...props} fmt={fmt} />} />
                             <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
                             <Area type="monotone" dataKey="income" stroke="#34d399" strokeWidth={2} fill="url(#gradIncome)" name="Income" />
                             <Area type="monotone" dataKey="expenses" stroke="#f87171" strokeWidth={2} fill="url(#gradExpenses)" name="Expenses" />

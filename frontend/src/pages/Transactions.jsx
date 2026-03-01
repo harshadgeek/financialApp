@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
-import { FiTrash2, FiPlus, FiEdit2 } from 'react-icons/fi';
+import { FiTrash2, FiPlus, FiEdit2, FiDownload, FiFileText } from 'react-icons/fi';
 import { getTransactions, addTransaction, updateTransaction, deleteTransaction } from '../api';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+import { useCurrency } from '../context/CurrencyContext.jsx';
 
-const fmt = v => `₹${Number(v).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 const CATEGORIES = ['SALARY', 'RENT', 'FOOD', 'TRANSPORT', 'ENTERTAINMENT', 'UTILITIES', 'HEALTH', 'SHOPPING', 'EDUCATION', 'INVESTMENT', 'OTHER'];
 
 const defaultForm = { amount: '', type: 'EXPENSE', category: 'FOOD', description: '', date: new Date().toISOString().split('T')[0] };
 
 export default function Transactions() {
+    const { fmt, symbol, currency, rate } = useCurrency();
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -64,6 +68,107 @@ export default function Transactions() {
 
     const filtered = filterType === 'ALL' ? transactions : transactions.filter(t => t.type === filterType);
 
+    const exportToPdf = () => {
+        const doc = new jsPDF();
+        const username = localStorage.getItem('financeiq_username') || 'User';
+        const label = filterType === 'ALL' ? 'All Transactions' : `${filterType} Transactions`;
+
+        // Header bar
+        doc.setFillColor(15, 22, 41);
+        doc.rect(0, 0, 210, 28, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text('FinanceIQ', 14, 12);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Smart Finance Tracker', 14, 20);
+        doc.text(`Exported: ${new Date().toLocaleDateString('en-IN')}`, 150, 12);
+        doc.text(`User: ${username}`, 150, 20);
+
+        // Title
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(13);
+        doc.setFont('helvetica', 'bold');
+        doc.text(label, 14, 38);
+
+        // Summary
+        const totalIncome = filtered.filter(t => t.type === 'INCOME').reduce((s, t) => s + Number(t.amount), 0);
+        const totalExpense = filtered.filter(t => t.type === 'EXPENSE').reduce((s, t) => s + Number(t.amount), 0);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(80, 80, 80);
+        doc.text(`Records: ${filtered.length}   |   Total Income: ₹${totalIncome.toLocaleString('en-IN')}   |   Total Expenses: ₹${totalExpense.toLocaleString('en-IN')}`, 14, 46);
+
+        autoTable(doc, {
+            startY: 52,
+            head: [['Date', 'Description', 'Category', 'Type', 'Amount']],
+            body: filtered.map(t => [
+                t.date,
+                t.description || '—',
+                t.category,
+                t.type,
+                `${t.type === 'INCOME' ? '+' : '-'}₹${Number(t.amount).toLocaleString('en-IN')}`,
+            ]),
+            styles: { fontSize: 9, cellPadding: 3 },
+            headStyles: { fillColor: [79, 142, 247], textColor: 255, fontStyle: 'bold' },
+            alternateRowStyles: { fillColor: [245, 247, 250] },
+            didParseCell: (data) => {
+                if (data.section === 'body' && data.column.index === 3) {
+                    data.cell.styles.textColor = data.cell.raw === 'INCOME' ? [52, 211, 153] : [248, 113, 113];
+                    data.cell.styles.fontStyle = 'bold';
+                }
+                if (data.section === 'body' && data.column.index === 4) {
+                    data.cell.styles.textColor = data.row.raw[3] === 'INCOME' ? [52, 211, 153] : [248, 113, 113];
+                    data.cell.styles.fontStyle = 'bold';
+                }
+            },
+            columnStyles: {
+                0: { cellWidth: 28 },
+                1: { cellWidth: 55 },
+                2: { cellWidth: 32 },
+                3: { cellWidth: 24 },
+                4: { cellWidth: 34, halign: 'right' },
+            },
+        });
+
+        doc.save(`financeiq_transactions_${new Date().toISOString().split('T')[0]}.pdf`);
+    };
+
+    const exportToExcel = () => {
+        const username = localStorage.getItem('financeiq_username') || 'User';
+        const rows = filtered.map(t => ({
+            Date: t.date,
+            Description: t.description || '',
+            Category: t.category,
+            Type: t.type,
+            Amount: Number(t.amount),
+            'Amount (formatted)': `${t.type === 'INCOME' ? '+' : '-'}₹${Number(t.amount).toLocaleString('en-IN')}`,
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(rows);
+
+        // Column widths
+        ws['!cols'] = [
+            { wch: 14 }, { wch: 30 }, { wch: 18 }, { wch: 12 }, { wch: 14 }, { wch: 20 }
+        ];
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
+
+        // Add metadata sheet
+        const meta = XLSX.utils.aoa_to_sheet([
+            ['FinanceIQ — Smart Finance Tracker'],
+            ['Exported by:', username],
+            ['Export date:', new Date().toLocaleDateString('en-IN')],
+            ['Filter:', filterType === 'ALL' ? 'All Transactions' : `${filterType} only`],
+            ['Total records:', filtered.length],
+        ]);
+        XLSX.utils.book_append_sheet(wb, meta, 'Info');
+
+        XLSX.writeFile(wb, `financeiq_transactions_${new Date().toISOString().split('T')[0]}.xlsx`);
+    };
+
     return (
         <div>
             <div className="page-header">
@@ -71,9 +176,29 @@ export default function Transactions() {
                     <h2>Transactions</h2>
                     <p>All your income and expense records</p>
                 </div>
-                <button className="btn btn-primary" onClick={() => { if (showForm) resetForm(); else setShowForm(true); }}>
-                    <FiPlus /> {showForm ? 'Cancel' : 'Add Transaction'}
-                </button>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                    <button
+                        className="btn btn-ghost"
+                        onClick={exportToExcel}
+                        disabled={filtered.length === 0}
+                        title="Download as Excel"
+                        style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+                    >
+                        <FiDownload size={15} /> Excel
+                    </button>
+                    <button
+                        className="btn btn-ghost"
+                        onClick={exportToPdf}
+                        disabled={filtered.length === 0}
+                        title="Download as PDF"
+                        style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+                    >
+                        <FiFileText size={15} /> PDF
+                    </button>
+                    <button className="btn btn-primary" onClick={() => { if (showForm) resetForm(); else setShowForm(true); }}>
+                        <FiPlus /> {showForm ? 'Cancel' : 'Add Transaction'}
+                    </button>
+                </div>
             </div>
 
             {/* Add/Edit Form */}

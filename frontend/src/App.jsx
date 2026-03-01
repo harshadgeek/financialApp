@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route, NavLink, Navigate, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
-import { FiHome, FiCalendar, FiBarChart2, FiList, FiTarget, FiLogOut, FiRepeat, FiTrendingUp } from 'react-icons/fi';
+import { FiHome, FiCalendar, FiBarChart2, FiList, FiTarget, FiLogOut, FiRepeat, FiTrendingUp, FiRefreshCw } from 'react-icons/fi';
 import { getUserProfile, uploadProfilePicture } from './api';
+import { useCurrency, CURRENCIES } from './context/CurrencyContext.jsx';
 import Dashboard from './pages/Dashboard';
 import WeeklyReport from './pages/WeeklyReport';
 import MonthlyReport from './pages/MonthlyReport';
@@ -23,6 +24,7 @@ function ProtectedRoute({ children }) {
 
 function Sidebar() {
   const navigate = useNavigate();
+  const { currency, setCurrency, rate, rateLoading, rateError, lastUpdated, refreshRate } = useCurrency();
   const fileInputRef = useRef(null);
   const [profile, setProfile] = useState(null);
   const username = localStorage.getItem('financeiq_username') || 'User';
@@ -96,6 +98,40 @@ function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      {/* Currency Selector */}
+      <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Currency</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <select
+            value={currency}
+            onChange={e => setCurrency(e.target.value)}
+            className="form-select"
+            style={{ flex: 1, padding: '6px 10px', fontSize: '0.82rem' }}
+          >
+            {Object.entries(CURRENCIES).map(([code, meta]) => (
+              <option key={code} value={code}>{meta.symbol} {code} — {meta.label}</option>
+            ))}
+          </select>
+          <button
+            onClick={refreshRate}
+            disabled={rateLoading || currency === 'INR'}
+            title="Refresh live rate"
+            style={{ background: 'none', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6, color: 'var(--text-secondary)', cursor: 'pointer', padding: '6px 8px', display: 'flex', alignItems: 'center' }}
+          >
+            <FiRefreshCw size={13} style={{ animation: rateLoading ? 'spin 1s linear infinite' : 'none' }} />
+          </button>
+        </div>
+        <div style={{ marginTop: 5, fontSize: '0.7rem', color: rateError ? 'var(--danger)' : 'var(--text-muted)' }}>
+          {rateLoading && '⏳ Fetching live rate…'}
+          {!rateLoading && rateError && `⚠ ${rateError}`}
+          {!rateLoading && !rateError && currency !== 'INR' && `1 INR = ${rate.toFixed(4)} ${currency}`}
+          {!rateLoading && !rateError && currency !== 'INR' && lastUpdated && (
+            <span style={{ marginLeft: 6, opacity: 0.6 }}>· {lastUpdated.toLocaleTimeString()}</span>
+          )}
+          {currency === 'INR' && <span style={{ color: 'var(--accent-green)' }}>Base currency</span>}
+        </div>
+      </div>
 
       <div className="sidebar-footer">
         <div className="user-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

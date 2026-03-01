@@ -3,10 +3,9 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import { getWeeklyReport } from '../api';
+import { useCurrency } from '../context/CurrencyContext.jsx';
 
-const fmt = v => `₹${Number(v).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload, label, fmt }) => {
     if (!active || !payload?.length) return null;
     return (
         <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '12px 16px' }}>
@@ -19,6 +18,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function WeeklyReport() {
+    const { fmt, fmtAxis } = useCurrency();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -67,8 +67,8 @@ export default function WeeklyReport() {
                     <BarChart data={data.dailyData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }} barGap={6} barCategoryGap="30%">
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                         <XAxis dataKey="day" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `₹${v}`} />
-                        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+                        <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={fmtAxis} />
+                        <Tooltip content={(props) => <CustomTooltip {...props} fmt={fmt} />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
                         <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
                         <Bar dataKey="income" fill="#34d399" radius={[4, 4, 0, 0]} name="Income" />
                         <Bar dataKey="expenses" fill="#f87171" radius={[4, 4, 0, 0]} name="Expenses" />

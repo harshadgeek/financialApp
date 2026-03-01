@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { FiTrash2, FiPlus, FiEdit2 } from 'react-icons/fi';
 import { getRecurringTransactions, addRecurringTransaction, updateRecurringTransaction, deleteRecurringTransaction } from '../api';
+import { useCurrency } from '../context/CurrencyContext.jsx';
 
-const fmt = v => `₹${Number(v).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 const CATEGORIES = ['SALARY', 'RENT', 'FOOD', 'TRANSPORT', 'ENTERTAINMENT', 'UTILITIES', 'HEALTH', 'SHOPPING', 'EDUCATION', 'INVESTMENT', 'OTHER'];
 const FREQUENCIES = ['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'];
 
 const defaultForm = { amount: '', type: 'EXPENSE', category: 'RENT', description: '', frequency: 'MONTHLY', startDate: new Date().toISOString().split('T')[0], endDate: '', active: true };
 
 export default function RecurringTransactions() {
+    const { fmt, symbol } = useCurrency();
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -86,7 +87,7 @@ export default function RecurringTransactions() {
                     <div className="chart-title" style={{ marginBottom: 20 }}>{editingId ? '✏️ Edit Recurring Transaction' : '➕ New Recurring Transaction'}</div>
                     <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                         <div className="form-group">
-                            <label className="form-label">Amount (₹)</label>
+                            <label className="form-label">Amount ({symbol})</label>
                             <input className="form-input" type="number" step="0.01" min="0" placeholder="0.00" value={form.amount}
                                 onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} required />
                         </div>

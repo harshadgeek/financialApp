@@ -5,11 +5,11 @@ import {
 } from 'recharts';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { getMonthlyReport } from '../api';
+import { useCurrency } from '../context/CurrencyContext.jsx';
 
-const fmt = v => `₹${Number(v).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload, label, fmt }) => {
     if (!active || !payload?.length) return null;
     return (
         <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '12px 16px' }}>
@@ -22,6 +22,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function MonthlyReport() {
+    const { fmt, fmtAxis } = useCurrency();
     const now = new Date();
     const [month, setMonth] = useState(now.getMonth() + 1);
     const [year, setYear] = useState(now.getFullYear());
@@ -109,8 +110,8 @@ export default function MonthlyReport() {
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                                 <XAxis dataKey="day" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} label={{ value: 'Day of Month', position: 'insideBottom', offset: -2, fill: '#64748b', fontSize: 11 }} />
-                                <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `₹${v / 1000}k`} />
-                                <Tooltip content={<CustomTooltip />} />
+                                <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={fmtAxis} />
+                                <Tooltip content={(props) => <CustomTooltip {...props} fmt={fmt} />} />
                                 <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
                                 <Area type="monotone" dataKey="cumulativeIncome" stroke="#34d399" strokeWidth={2} fill="url(#gradCumInc)" name="Income" />
                                 <Area type="monotone" dataKey="cumulativeExpenses" stroke="#f87171" strokeWidth={2} fill="url(#gradCumExp)" name="Expenses" />
@@ -127,8 +128,8 @@ export default function MonthlyReport() {
                                 <BarChart data={data.weeklyBreakdown} barGap={6} barCategoryGap="35%">
                                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                                     <XAxis dataKey="week" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
-                                    <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `₹${v}`} />
-                                    <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+                                    <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={fmtAxis} />
+                                    <Tooltip content={(props) => <CustomTooltip {...props} fmt={fmt} />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
                                     <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
                                     <Bar dataKey="income" fill="#34d399" radius={[4, 4, 0, 0]} name="Income" />
                                     <Bar dataKey="expenses" fill="#f87171" radius={[4, 4, 0, 0]} name="Expenses" />

@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { FiTrendingUp, FiArrowRight, FiCalendar } from 'react-icons/fi';
 import { getFutureProjection } from '../api';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area } from 'recharts';
-
-const fmt = v => `₹${Number(v).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+import { useCurrency } from '../context/CurrencyContext.jsx';
 
 export default function FutureTrends() {
+    const { fmt, fmtAxis } = useCurrency();
     const [projection, setProjection] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -105,7 +105,7 @@ export default function FutureTrends() {
                                         axisLine={false}
                                         tickLine={false}
                                         tick={{ fill: 'var(--text-muted)', fontSize: 12 }}
-                                        tickFormatter={v => `₹${v / 1000}k`}
+                                        tickFormatter={fmtAxis}
                                     />
                                     <Tooltip
                                         contentStyle={{ background: '#1e1e2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.5)' }}
