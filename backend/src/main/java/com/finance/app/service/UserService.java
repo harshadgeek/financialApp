@@ -1,19 +1,22 @@
 package com.finance.app.service;
 
+import com.finance.app.dto.RegisterRequest;
+import com.finance.app.dto.UserDto;
 import com.finance.app.model.User;
 import com.finance.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.finance.app.dto.RegisterRequest;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
@@ -46,5 +49,18 @@ public class UserService implements UserDetailsService {
                 user.getPassword(),
                 Collections.emptyList()
         );
+    }
+
+    public UserDto getProfile(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        return new UserDto(user.getUsername(), user.getEmail(), user.getProfilePictureUrl());
+    }
+
+    public User updateProfilePicture(String username, String url) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        user.setProfilePictureUrl(url);
+        return userRepository.save(user);
     }
 }

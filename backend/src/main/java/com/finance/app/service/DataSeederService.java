@@ -1,7 +1,6 @@
 package com.finance.app.service;
 
 import com.finance.app.model.*;
-import com.finance.app.repository.BudgetRepository;
 import com.finance.app.repository.TransactionRepository;
 import com.finance.app.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +18,6 @@ import java.util.Random;
 public class DataSeederService implements CommandLineRunner {
 
     private final TransactionRepository transactionRepository;
-    private final BudgetRepository budgetRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -35,29 +33,10 @@ public class DataSeederService implements CommandLineRunner {
 
         if (transactionRepository.count() > 0) return;
 
-        seedBudgets();
         seedTransactions();
     }
 
-    private void seedBudgets() {
-        LocalDate today = LocalDate.now();
-        Category[] categories = {Category.FOOD, Category.TRANSPORT, Category.ENTERTAINMENT, Category.UTILITIES, Category.HEALTH, Category.SHOPPING};
-        BigDecimal[] limits = {
-                new BigDecimal("8000"), new BigDecimal("3000"),
-                new BigDecimal("3000"), new BigDecimal("4000"),
-                new BigDecimal("2000"), new BigDecimal("5000")
-        };
 
-        for (int i = 0; i < categories.length; i++) {
-            budgetRepository.save(Budget.builder()
-                    .category(categories[i])
-                    .monthlyLimit(limits[i])
-                    .month(today.getMonthValue())
-                    .year(today.getYear())
-                    .username("demo")
-                    .build());
-        }
-    }
 
     private void seedTransactions() {
         LocalDate today = LocalDate.now();

@@ -109,7 +109,7 @@ export default function MonthlyReport() {
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                                 <XAxis dataKey="day" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} label={{ value: 'Day of Month', position: 'insideBottom', offset: -2, fill: '#64748b', fontSize: 11 }} />
-                                <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `$${v / 1000}k`} />
+                                <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `₹${v / 1000}k`} />
                                 <Tooltip content={<CustomTooltip />} />
                                 <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
                                 <Area type="monotone" dataKey="cumulativeIncome" stroke="#34d399" strokeWidth={2} fill="url(#gradCumInc)" name="Income" />
@@ -127,7 +127,7 @@ export default function MonthlyReport() {
                                 <BarChart data={data.weeklyBreakdown} barGap={6} barCategoryGap="35%">
                                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                                     <XAxis dataKey="week" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
-                                    <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `$${v}`} />
+                                    <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `₹${v}`} />
                                     <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
                                     <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
                                     <Bar dataKey="income" fill="#34d399" radius={[4, 4, 0, 0]} name="Income" />

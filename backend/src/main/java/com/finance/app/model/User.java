@@ -24,4 +24,6 @@ public class User {
     private String email;
     
     private String password; // BCrypt hashed
+    
+    private String profilePictureUrl;
 }

@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, NavLink, Navigate, useNavigate } from 'react-router-dom';
+import { useEffect, useState, useRef } from 'react';
 import { FiHome, FiCalendar, FiBarChart2, FiList, FiTarget, FiLogOut, FiRepeat, FiTrendingUp } from 'react-icons/fi';
+import { getUserProfile, uploadProfilePicture } from './api';
 import Dashboard from './pages/Dashboard';
 import WeeklyReport from './pages/WeeklyReport';
 import MonthlyReport from './pages/MonthlyReport';
@@ -17,14 +19,44 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
+
+
 function Sidebar() {
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
+  const [profile, setProfile] = useState(null);
   const username = localStorage.getItem('financeiq_username') || 'User';
+
+  useEffect(() => {
+    getUserProfile()
+      .then(setProfile)
+      .catch(err => console.error('Failed to fetch profile', err));
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('financeiq_token');
     localStorage.removeItem('financeiq_username');
     navigate('/login');
+  };
+
+  const onAvatarClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const updatedProfile = await uploadProfilePicture(formData);
+      setProfile(updatedProfile);
+    } catch (err) {
+      alert('Failed to upload profile picture');
+      console.error(err);
+    }
   };
 
   const navItems = [
@@ -35,6 +67,10 @@ function Sidebar() {
     { to: '/recurring-transactions', icon: <FiRepeat />, label: 'Recurring' },
     { to: '/future-trends', icon: <FiTrendingUp />, label: 'Future Trends' },
   ];
+
+  const backendPort = import.meta.env.VITE_BACKEND_PORT || 8080;
+  const baseUrl = `http://localhost:${backendPort}`;
+  const avatarUrl = profile?.profilePictureUrl ? `${baseUrl}${profile.profilePictureUrl}` : null;
 
   return (
     <aside className="sidebar">
@@ -64,7 +100,25 @@ function Sidebar() {
       <div className="sidebar-footer">
         <div className="user-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div className="user-avatar">{username.charAt(0).toUpperCase()}</div>
+            <div
+              className="user-avatar"
+              onClick={onAvatarClick}
+              style={{ cursor: 'pointer', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              title="Click to change profile picture"
+            >
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                username.charAt(0).toUpperCase()
+              )}
+            </div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              accept="image/*"
+              onChange={handleFileChange}
+            />
             <div className="user-info">
               <div className="user-name" style={{ textTransform: 'capitalize' }}>{username}</div>
               <div className="user-role">Personal</div>

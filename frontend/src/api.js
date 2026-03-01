@@ -39,3 +39,10 @@ export const updateRecurringTransaction = (id, txn) => api.put(`/recurring-trans
 export const deleteRecurringTransaction = (id) => api.delete(`/recurring-transactions/${id}`);
 
 export const getFutureProjection = (targetDate) => api.get('/reports/future-projection', { params: { targetDate } }).then(r => r.data);
+
+// User Profile
+export const getUserProfile = () => api.get('/users/profile').then(r => r.data);
+export const uploadProfilePicture = (formData) => api.post('/users/profile-picture', formData, {
+  headers: { 'Content-Type': 'multipart/form-data' }
+}).then(r => r.data);
+

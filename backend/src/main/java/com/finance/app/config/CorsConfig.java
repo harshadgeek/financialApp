@@ -17,7 +17,13 @@ public class CorsConfig {
         config.addAllowedOrigin("http://localhost:5174");
         config.addAllowedOrigin("http://localhost:5175");
         config.addAllowedOrigin("http://localhost:5176");
-        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedOrigin("http://localhost:5177");
+        config.addAllowedOrigin("http://localhost:5178");
+        config.addAllowedOrigin("http://localhost:5179");
+        config.addAllowedOrigin("http://localhost:5180");
+        config.addAllowedOrigin("http://localhost:5181");
+        config.addAllowedOrigin("http://localhost:5182");
+        config.addAllowedOrigin("http://localhost:3083");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 
