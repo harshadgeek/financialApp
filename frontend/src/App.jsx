@@ -16,7 +16,7 @@ import QuickAddModal from './components/QuickAddModal';
 import ChangePasswordModal from './components/ChangePasswordModal';
 
 function ProtectedRoute({ children }) {
-  const token = localStorage.getItem('financeiq_token');
+  const token = sessionStorage.getItem('financeiq_token');
   if (!token) {
     return <Navigate to="/login" replace />;
   }
@@ -31,7 +31,7 @@ function Sidebar() {
   const fileInputRef = useRef(null);
   const [profile, setProfile] = useState(null);
   const [showChangePassword, setShowChangePassword] = useState(false);
-  const username = localStorage.getItem('financeiq_username') || 'User';
+  const username = sessionStorage.getItem('financeiq_username') || 'User';
 
   useEffect(() => {
     getUserProfile()
@@ -40,8 +40,8 @@ function Sidebar() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('financeiq_token');
-    localStorage.removeItem('financeiq_username');
+    sessionStorage.removeItem('financeiq_token');
+    sessionStorage.removeItem('financeiq_username');
     navigate('/login');
   };
 

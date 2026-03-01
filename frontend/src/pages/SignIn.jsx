@@ -16,8 +16,8 @@ export default function SignIn() {
         setError('');
         try {
             const res = await login(form);
-            localStorage.setItem('financeiq_token', res.data.token);
-            localStorage.setItem('financeiq_username', res.data.username);
+            sessionStorage.setItem('financeiq_token', res.data.token);
+            sessionStorage.setItem('financeiq_username', res.data.username);
             navigate('/');
         } catch (err) {
             const msg =

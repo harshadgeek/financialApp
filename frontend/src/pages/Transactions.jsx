@@ -96,7 +96,7 @@ export default function Transactions() {
 
     const exportToPdf = () => {
         const doc = new jsPDF();
-        const username = localStorage.getItem('financeiq_username') || 'User';
+        const username = sessionStorage.getItem('financeiq_username') || 'User';
         const label = filterType === 'ALL' ? 'All Transactions' : `${filterType} Transactions`;
 
         // Header bar
@@ -162,7 +162,7 @@ export default function Transactions() {
     };
 
     const exportToExcel = () => {
-        const username = localStorage.getItem('financeiq_username') || 'User';
+        const username = sessionStorage.getItem('financeiq_username') || 'User';
         const rows = filtered.map(t => ({
             Date: t.date,
             Description: t.description || '',
