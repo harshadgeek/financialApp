@@ -25,4 +25,7 @@ public class Transaction {
     private Category category;
     private String description;
     private LocalDate date;
+    
+    @Indexed
+    private String username; // The user this transaction belongs to
 }

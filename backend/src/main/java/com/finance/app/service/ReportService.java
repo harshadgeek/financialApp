@@ -25,11 +25,11 @@ public class ReportService {
 
     // ─── Dashboard ────────────────────────────────────────────────────────────
 
-    public DashboardSummaryDto getDashboardSummary() {
+    public DashboardSummaryDto getDashboardSummary(String username) {
         LocalDate today = LocalDate.now();
         LocalDate start = today.minusMonths(5).withDayOfMonth(1);
 
-        List<Transaction> all = transactionRepository.findByDateBetweenOrderByDateDesc(start, today);
+        List<Transaction> all = transactionRepository.findByUsernameAndDateBetweenOrderByDateDesc(username, start, today);
 
         BigDecimal totalIncome = sumByType(all, TransactionType.INCOME);
         BigDecimal totalExpenses = sumByType(all, TransactionType.EXPENSE);
@@ -43,7 +43,7 @@ public class ReportService {
         for (int i = 5; i >= 0; i--) {
             LocalDate mStart = today.withDayOfMonth(1).minusMonths(i);
             LocalDate mEnd = i == 0 ? today : mStart.withDayOfMonth(mStart.lengthOfMonth());
-            List<Transaction> monthTx = transactionRepository.findByDateBetweenOrderByDateDesc(mStart, mEnd);
+            List<Transaction> monthTx = transactionRepository.findByUsernameAndDateBetweenOrderByDateDesc(username, mStart, mEnd);
             trend.add(new DashboardSummaryDto.MonthlyTrendDto(
                     mStart.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH),
                     sumByType(monthTx, TransactionType.INCOME),
@@ -53,7 +53,7 @@ public class ReportService {
 
         // Expense by category (current month)
         LocalDate thisMonthStart = today.withDayOfMonth(1);
-        List<Transaction> thisMonth = transactionRepository.findByDateBetweenOrderByDateDesc(thisMonthStart, today);
+        List<Transaction> thisMonth = transactionRepository.findByUsernameAndDateBetweenOrderByDateDesc(username, thisMonthStart, today);
         Map<String, BigDecimal> byCategory = thisMonth.stream()
                 .filter(t -> t.getType() == TransactionType.EXPENSE)
                 .collect(Collectors.groupingBy(
@@ -73,12 +73,12 @@ public class ReportService {
 
     // ─── Weekly ───────────────────────────────────────────────────────────────
 
-    public WeeklyReportDto getWeeklyReport() {
+    public WeeklyReportDto getWeeklyReport(String username) {
         LocalDate today = LocalDate.now();
         LocalDate weekStart = today.with(DayOfWeek.MONDAY);
         LocalDate weekEnd = weekStart.plusDays(6);
 
-        List<Transaction> weekTx = transactionRepository.findByDateBetweenOrderByDateDesc(weekStart, weekEnd);
+        List<Transaction> weekTx = transactionRepository.findByUsernameAndDateBetweenOrderByDateDesc(username, weekStart, weekEnd);
 
         List<WeeklyReportDto.DailyDataDto> daily = new ArrayList<>();
         for (int d = 0; d < 7; d++) {
@@ -114,13 +114,13 @@ public class ReportService {
 
     // ─── Monthly ──────────────────────────────────────────────────────────────
 
-    public MonthlyReportDto getMonthlyReport(int month, int year) {
+    public MonthlyReportDto getMonthlyReport(String username, int month, int year) {
         LocalDate start = LocalDate.of(year, month, 1);
         LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
         LocalDate today = LocalDate.now();
         LocalDate effectiveEnd = end.isAfter(today) ? today : end;
 
-        List<Transaction> monthTx = transactionRepository.findByDateBetweenOrderByDateDesc(start, effectiveEnd);
+        List<Transaction> monthTx = transactionRepository.findByUsernameAndDateBetweenOrderByDateDesc(username, start, effectiveEnd);
 
         BigDecimal totalIncome = sumByType(monthTx, TransactionType.INCOME);
         BigDecimal totalExpenses = sumByType(monthTx, TransactionType.EXPENSE);

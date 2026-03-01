@@ -6,7 +6,7 @@ import com.finance.app.dto.WeeklyReportDto;
 import com.finance.app.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
+import java.security.Principal;
 import java.time.LocalDate;
 
 @RestController
@@ -17,22 +17,23 @@ public class ReportController {
     private final ReportService reportService;
 
     @GetMapping("/dashboard")
-    public DashboardSummaryDto getDashboard() {
-        return reportService.getDashboardSummary();
+    public DashboardSummaryDto getDashboard(Principal principal) {
+        return reportService.getDashboardSummary(principal.getName());
     }
 
     @GetMapping("/weekly")
-    public WeeklyReportDto getWeeklyReport() {
-        return reportService.getWeeklyReport();
+    public WeeklyReportDto getWeeklyReport(Principal principal) {
+        return reportService.getWeeklyReport(principal.getName());
     }
 
     @GetMapping("/monthly")
     public MonthlyReportDto getMonthlyReport(
             @RequestParam(defaultValue = "0") int month,
-            @RequestParam(defaultValue = "0") int year) {
+            @RequestParam(defaultValue = "0") int year,
+            Principal principal) {
         LocalDate now = LocalDate.now();
         int m = month == 0 ? now.getMonthValue() : month;
         int y = year == 0 ? now.getYear() : year;
-        return reportService.getMonthlyReport(m, y);
+        return reportService.getMonthlyReport(principal.getName(), m, y);
     }
 }

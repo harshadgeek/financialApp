@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/budgets")
@@ -26,8 +27,10 @@ public class BudgetController {
     @GetMapping
     public List<Map<String, Object>> getBudgets(
             @RequestParam(defaultValue = "0") int month,
-            @RequestParam(defaultValue = "0") int year) {
+            @RequestParam(defaultValue = "0") int year,
+            Principal principal) {
 
+        String username = principal.getName();
         LocalDate now = LocalDate.now();
         int m = month == 0 ? now.getMonthValue() : month;
         int y = year == 0 ? now.getYear() : year;
@@ -36,7 +39,7 @@ public class BudgetController {
         LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
         LocalDate effectiveEnd = end.isAfter(now) ? now : end;
 
-        List<Transaction> monthTx = transactionRepository.findByDateBetweenOrderByDateDesc(start, effectiveEnd);
+        List<Transaction> monthTx = transactionRepository.findByUsernameAndDateBetweenOrderByDateDesc(username, start, effectiveEnd);
         Map<Category, BigDecimal> spendMap = monthTx.stream()
                 .filter(t -> t.getType() == TransactionType.EXPENSE)
                 .collect(Collectors.groupingBy(
@@ -44,7 +47,7 @@ public class BudgetController {
                         Collectors.reducing(BigDecimal.ZERO, Transaction::getAmount, BigDecimal::add)
                 ));
 
-        List<Budget> budgets = budgetRepository.findByMonthAndYear(m, y);
+        List<Budget> budgets = budgetRepository.findByUsernameAndMonthAndYear(username, m, y);
         List<Map<String, Object>> result = new ArrayList<>();
 
         for (Budget b : budgets) {
@@ -64,12 +67,13 @@ public class BudgetController {
     }
 
     @PostMapping
-    public ResponseEntity<Budget> upsertBudget(@RequestBody Budget budget) {
+    public ResponseEntity<Budget> upsertBudget(@RequestBody Budget budget, Principal principal) {
+        String username = principal.getName();
         LocalDate now = LocalDate.now();
         int m = budget.getMonth() == 0 ? now.getMonthValue() : budget.getMonth();
         int y = budget.getYear() == 0 ? now.getYear() : budget.getYear();
 
-        Optional<Budget> existing = budgetRepository.findByCategoryAndMonthAndYear(budget.getCategory(), m, y);
+        Optional<Budget> existing = budgetRepository.findByUsernameAndCategoryAndMonthAndYear(username, budget.getCategory(), m, y);
         if (existing.isPresent()) {
             Budget b = existing.get();
             b.setMonthlyLimit(budget.getMonthlyLimit());
@@ -77,6 +81,7 @@ public class BudgetController {
         }
         budget.setMonth(m);
         budget.setYear(y);
+        budget.setUsername(username);
         return ResponseEntity.ok(budgetRepository.save(budget));
     }
 }

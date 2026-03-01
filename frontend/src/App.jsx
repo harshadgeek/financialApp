@@ -1,12 +1,31 @@
-import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom';
-import { FiHome, FiCalendar, FiBarChart2, FiList, FiTarget, FiDollarSign } from 'react-icons/fi';
+import { BrowserRouter, Routes, Route, NavLink, Navigate, useNavigate } from 'react-router-dom';
+import { FiHome, FiCalendar, FiBarChart2, FiList, FiTarget, FiLogOut } from 'react-icons/fi';
 import Dashboard from './pages/Dashboard';
 import WeeklyReport from './pages/WeeklyReport';
 import MonthlyReport from './pages/MonthlyReport';
 import Transactions from './pages/Transactions';
 import Budgets from './pages/Budgets';
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
+
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem('financeiq_token');
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
 
 function Sidebar() {
+  const navigate = useNavigate();
+  const username = localStorage.getItem('financeiq_username') || 'User';
+
+  const handleLogout = () => {
+    localStorage.removeItem('financeiq_token');
+    localStorage.removeItem('financeiq_username');
+    navigate('/login');
+  };
+
   const navItems = [
     { to: '/', icon: <FiHome />, label: 'Dashboard' },
     { to: '/weekly', icon: <FiCalendar />, label: 'Weekly Report' },
@@ -41,35 +60,54 @@ function Sidebar() {
       </nav>
 
       <div className="sidebar-footer">
-        <div className="user-card">
-          <div className="user-avatar">U</div>
-          <div className="user-info">
-            <div className="user-name">User</div>
-            <div className="user-role">Personal Account</div>
+        <div className="user-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div className="user-avatar">{username.charAt(0).toUpperCase()}</div>
+            <div className="user-info">
+              <div className="user-name" style={{ textTransform: 'capitalize' }}>{username}</div>
+              <div className="user-role">Personal</div>
+            </div>
           </div>
+          <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 8 }}>
+            <FiLogOut size={18} />
+          </button>
         </div>
       </div>
     </aside>
   );
 }
 
+function MainLayout() {
+  return (
+    <div className="app-layout">
+      <Sidebar />
+      <div className="main-content">
+        <div className="page-content">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/weekly" element={<WeeklyReport />} />
+            <Route path="/monthly" element={<MonthlyReport />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/budgets" element={<Budgets />} />
+          </Routes>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="app-layout">
-        <Sidebar />
-        <div className="main-content">
-          <div className="page-content">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/weekly" element={<WeeklyReport />} />
-              <Route path="/monthly" element={<MonthlyReport />} />
-              <Route path="/transactions" element={<Transactions />} />
-              <Route path="/budgets" element={<Budgets />} />
-            </Routes>
-          </div>
-        </div>
-      </div>
+      <Routes>
+        <Route path="/login" element={<SignIn />} />
+        <Route path="/register" element={<SignUp />} />
+        <Route path="/*" element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        } />
+      </Routes>
     </BrowserRouter>
   );
 }

@@ -5,25 +5,23 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.math.BigDecimal;
-
-@Document(collection = "budgets")
+@Document(collection = "users")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Budget {
-
+public class User {
     @Id
     private String id;
-
-    private Category category;
-    private BigDecimal monthlyLimit;
-    private int month;
-    private int year;
     
-    @org.springframework.data.mongodb.core.index.Indexed
-    private String username; // The user this budget belongs to
+    @Indexed(unique = true)
+    private String username;
+    
+    @Indexed(unique = true)
+    private String email;
+    
+    private String password; // BCrypt hashed
 }
