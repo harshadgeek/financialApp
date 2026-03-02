@@ -15,6 +15,11 @@ backend/backend-output.txt
 logs/
 *.log
 npm-debug.log*
+get-logs.bat
+
+# --- Google Cloud ---
+.gcloudignore
+DEPLOYMENT.md
 
 # --- Environment & Secrets ---
 .env

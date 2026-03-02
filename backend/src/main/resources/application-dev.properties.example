@@ -1,0 +1,9 @@
+spring.application.name=financial-app
+
+# MongoDB Configuration
+# Replace the value of MONGODB_URI in your environment with your actual connection string.
+# Example: mongodb+srv://<username>:<password>@cluster.mongodb.net/database?ssl=true&authSource=admin
+spring.data.mongodb.uri=${MONGODB_URI:mongodb://localhost:27017/financialApp}
+spring.data.mongodb.auto-index-creation=true
+
+server.port=${PORT:8080}

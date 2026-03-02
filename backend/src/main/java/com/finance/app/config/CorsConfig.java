@@ -15,10 +15,11 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Allow any localhost port (Vite picks a dynamic one each run).
-        // setAllowedOriginPatterns supports wildcards and is compatible
-        // with allowCredentials=true, unlike addAllowedOrigin("*").
-        config.setAllowedOriginPatterns(List.of("http://localhost:*"));
+        // Allow localhost and the deployed Frontend URL
+        config.setAllowedOriginPatterns(List.of(
+            "http://localhost:*",
+            "https://financial-app-frontend-600881932726.us-central1.run.app"
+        ));
 
         // Credentials (Authorization header / cookies) must be sent.
         config.setAllowCredentials(true);
