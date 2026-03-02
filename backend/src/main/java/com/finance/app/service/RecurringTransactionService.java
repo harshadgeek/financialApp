@@ -73,10 +73,10 @@ public class RecurringTransactionService {
     }
 
     /**
-     * Runs every day at 00:01 (1 AM).
+     * Runs every 5 minutes.
      * Checks for active recurring transactions where nextExecutionDate is <= today.
      */
-    @Scheduled(cron = "0 1 0 * * ?")
+    @Scheduled(cron = "0 */5 * * * ?")
     @Transactional
     public void processRecurringTransactions() {
         LocalDate today = LocalDate.now();

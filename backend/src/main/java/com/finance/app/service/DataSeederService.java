@@ -3,6 +3,7 @@ import com.finance.app.model.Category;
 import com.finance.app.model.Transaction;
 import com.finance.app.model.TransactionType;
 import com.finance.app.model.User;
+import com.finance.app.repository.TransactionRepository;
 import com.finance.app.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
