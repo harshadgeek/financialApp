@@ -15,7 +15,7 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
 
     public List<Transaction> getAllTransactions(String username) {
-        return transactionRepository.findAllByUsernameOrderByDateDesc(username);
+        return transactionRepository.findAllByUsernameOrderByDateDescCreatedAtDesc(username);
     }
 
     public Transaction addTransaction(Transaction transaction) {

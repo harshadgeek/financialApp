@@ -44,7 +44,7 @@ public class BudgetService {
         LocalDate end = ym.atEndOfMonth();
 
         List<Transaction> txs = transactionRepository
-                .findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(username, start, end);
+                .findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDescCreatedAtDesc(username, start, end);
 
         return budgetRepository.findAllByUsername(username).stream().map(budget -> {
             BigDecimal spent = txs.stream()

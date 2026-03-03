@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface TransactionRepository extends MongoRepository<Transaction, String> {
-    List<Transaction> findAllByUsernameOrderByDateDesc(String username);
+    List<Transaction> findAllByUsernameOrderByDateDescCreatedAtDesc(String username);
     @org.springframework.data.mongodb.repository.Query("{ 'username': ?0, 'date': { $gte: ?1, $lte: ?2 } }")
-    List<Transaction> findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(String username, LocalDate startDate, LocalDate endDate);
+    List<Transaction> findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDescCreatedAtDesc(String username, LocalDate startDate, LocalDate endDate);
 }

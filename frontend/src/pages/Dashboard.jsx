@@ -157,21 +157,34 @@ export default function Dashboard() {
                         <tr>
                             <th>Description</th>
                             <th>Category</th>
-                            <th>Date</th>
+                            <th>Date & Time</th>
                             <th>Type</th>
                             <th>Amount</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {(recentTx).slice(0, 8).map(tx => (
-                            <tr key={tx.id}>
-                                <td>{tx.description}</td>
-                                <td><span style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>{tx.category}</span></td>
-                                <td style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>{tx.date}</td>
-                                <td><span className={`badge ${tx.type === 'INCOME' ? 'income' : 'expense'}`}>{tx.type}</span></td>
-                                <td className={tx.type === 'INCOME' ? 'amount-positive' : 'amount-negative'}>{tx.type === 'INCOME' ? '+' : '-'}{fmt(tx.amount)}</td>
-                            </tr>
-                        ))}
+                        {(recentTx).slice(0, 8).map(tx => {
+                            let timeString = '';
+                            if (tx.createdAt) {
+                                try {
+                                    timeString = new Intl.DateTimeFormat(navigator.language, {
+                                        hour: 'numeric', minute: 'numeric'
+                                    }).format(new Date(tx.createdAt));
+                                } catch (e) { }
+                            }
+                            return (
+                                <tr key={tx.id}>
+                                    <td>{tx.description}</td>
+                                    <td><span style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>{tx.category}</span></td>
+                                    <td style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+                                        {tx.date}
+                                        {timeString && <span style={{ opacity: 0.6, marginLeft: 6 }}>{timeString}</span>}
+                                    </td>
+                                    <td><span className={`badge ${tx.type === 'INCOME' ? 'income' : 'expense'}`}>{tx.type}</span></td>
+                                    <td className={tx.type === 'INCOME' ? 'amount-positive' : 'amount-negative'}>{tx.type === 'INCOME' ? '+' : '-'}{fmt(tx.amount)}</td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
                 {recentTx.length === 0 && (

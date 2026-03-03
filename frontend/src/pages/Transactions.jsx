@@ -326,7 +326,7 @@ export default function Transactions() {
                     <table className="data-table">
                         <thead>
                             <tr>
-                                <th>Date</th>
+                                <th>Date & Time</th>
                                 <th>Description</th>
                                 <th>Category</th>
                                 <th>Type</th>
@@ -338,27 +338,43 @@ export default function Transactions() {
                             {filtered.length === 0 && (
                                 <tr><td colSpan={6} style={{ textAlign: 'center', padding: 32, color: 'var(--text-muted)' }}>No transactions found.</td></tr>
                             )}
-                            {filtered.map(tx => (
-                                <tr key={tx.id}>
-                                    <td style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>{tx.date}</td>
-                                    <td>{tx.description || '—'}</td>
-                                    <td><span style={{ background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: 4, fontSize: '0.78rem' }}>{tx.category}</span></td>
-                                    <td><span className={`badge ${tx.type === 'INCOME' ? 'income' : 'expense'}`}>{tx.type}</span></td>
-                                    <td className={tx.type === 'INCOME' ? 'amount-positive' : 'amount-negative'}>
-                                        {tx.type === 'INCOME' ? '+' : '-'}{fmt(tx.amount)}
-                                    </td>
-                                    <td>
-                                        <div style={{ display: 'flex', gap: 8 }}>
-                                            <button className="btn btn-ghost btn-sm" onClick={() => handleEditClick(tx)} title="Edit">
-                                                <FiEdit2 />
-                                            </button>
-                                            <button className="btn btn-danger btn-sm" onClick={() => handleDelete(tx.id)} title="Delete">
-                                                <FiTrash2 />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                            {filtered.map((tx, index) => {
+                                const isFirstOfDay = index === 0 || filtered[index - 1].date !== tx.date;
+
+                                let timeString = '';
+                                if (tx.createdAt) {
+                                    try {
+                                        timeString = new Intl.DateTimeFormat(navigator.language, {
+                                            hour: 'numeric', minute: 'numeric'
+                                        }).format(new Date(tx.createdAt));
+                                    } catch (e) { }
+                                }
+
+                                return (
+                                    <tr key={tx.id} style={{ borderTop: isFirstOfDay ? '1px solid rgba(255,255,255,0.1)' : '1px solid transparent' }}>
+                                        <td style={{ color: isFirstOfDay ? 'var(--text-primary)' : 'var(--text-muted)', fontSize: '0.85rem' }}>
+                                            <div style={{ fontWeight: isFirstOfDay ? 600 : 400 }}>{isFirstOfDay ? tx.date : ''}</div>
+                                            {timeString && <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: isFirstOfDay ? 2 : 0 }}>{timeString}</div>}
+                                        </td>
+                                        <td>{tx.description || '—'}</td>
+                                        <td><span style={{ background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: 4, fontSize: '0.78rem' }}>{tx.category}</span></td>
+                                        <td><span className={`badge ${tx.type === 'INCOME' ? 'income' : 'expense'}`}>{tx.type}</span></td>
+                                        <td className={tx.type === 'INCOME' ? 'amount-positive' : 'amount-negative'}>
+                                            {tx.type === 'INCOME' ? '+' : '-'}{fmt(tx.amount)}
+                                        </td>
+                                        <td>
+                                            <div style={{ display: 'flex', gap: 8 }}>
+                                                <button className="btn btn-ghost btn-sm" onClick={() => handleEditClick(tx)} title="Edit">
+                                                    <FiEdit2 />
+                                                </button>
+                                                <button className="btn btn-danger btn-sm" onClick={() => handleDelete(tx.id)} title="Delete">
+                                                    <FiTrash2 />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )
+                            })}
                         </tbody>
                     </table>
                 </div>

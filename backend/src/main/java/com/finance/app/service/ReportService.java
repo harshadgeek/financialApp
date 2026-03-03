@@ -39,7 +39,7 @@ public class ReportService {
         LocalDate today = LocalDate.now();
         LocalDate start = today.minusMonths(5).withDayOfMonth(1);
 
-        List<Transaction> all = transactionRepository.findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(username, start, today);
+        List<Transaction> all = transactionRepository.findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDescCreatedAtDesc(username, start, today);
 
         BigDecimal totalIncome = sumByType(all, TransactionType.INCOME);
         BigDecimal totalExpenses = sumByType(all, TransactionType.EXPENSE);
@@ -53,7 +53,7 @@ public class ReportService {
         for (int i = 5; i >= 0; i--) {
             LocalDate mStart = today.withDayOfMonth(1).minusMonths(i);
             LocalDate mEnd = i == 0 ? today : mStart.withDayOfMonth(mStart.lengthOfMonth());
-            List<Transaction> monthTx = transactionRepository.findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(username, mStart, mEnd);
+            List<Transaction> monthTx = transactionRepository.findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDescCreatedAtDesc(username, mStart, mEnd);
             trend.add(new DashboardSummaryDto.MonthlyTrendDto(
                     mStart.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH),
                     sumByType(monthTx, TransactionType.INCOME),
@@ -63,7 +63,7 @@ public class ReportService {
 
         // Expense by category (current month)
         LocalDate thisMonthStart = today.withDayOfMonth(1);
-        List<Transaction> thisMonth = transactionRepository.findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(username, thisMonthStart, today);
+        List<Transaction> thisMonth = transactionRepository.findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDescCreatedAtDesc(username, thisMonthStart, today);
         Map<String, BigDecimal> byCategory = thisMonth.stream()
                 .filter(t -> t.getType() == TransactionType.EXPENSE)
                 .collect(Collectors.groupingBy(
@@ -88,7 +88,7 @@ public class ReportService {
         LocalDate weekStart = today.with(DayOfWeek.MONDAY);
         LocalDate weekEnd = weekStart.plusDays(6);
 
-        List<Transaction> weekTx = transactionRepository.findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(username, weekStart, weekEnd);
+        List<Transaction> weekTx = transactionRepository.findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDescCreatedAtDesc(username, weekStart, weekEnd);
 
         List<WeeklyReportDto.DailyDataDto> daily = new ArrayList<>();
         for (int d = 0; d < 7; d++) {
@@ -130,7 +130,7 @@ public class ReportService {
         LocalDate today = LocalDate.now();
         LocalDate effectiveEnd = end.isAfter(today) ? today : end;
 
-        List<Transaction> monthTx = transactionRepository.findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDesc(username, start, effectiveEnd);
+        List<Transaction> monthTx = transactionRepository.findByUsernameAndDateGreaterThanEqualAndDateLessThanEqualOrderByDateDescCreatedAtDesc(username, start, effectiveEnd);
 
         BigDecimal totalIncome = sumByType(monthTx, TransactionType.INCOME);
         BigDecimal totalExpenses = sumByType(monthTx, TransactionType.EXPENSE);
@@ -193,7 +193,7 @@ public class ReportService {
         if (targetDate.isBefore(today)) targetDate = today.plusMonths(1);
 
         // 1. Current Balance
-        List<Transaction> allHistory = transactionRepository.findAllByUsernameOrderByDateDesc(username);
+        List<Transaction> allHistory = transactionRepository.findAllByUsernameOrderByDateDescCreatedAtDesc(username);
         BigDecimal currentBalance = allHistory.stream()
                 .filter(t -> t.getAmount() != null)
                 .map(t -> t.getType() == TransactionType.INCOME ? t.getAmount() : t.getAmount().negate())
