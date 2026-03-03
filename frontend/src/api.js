@@ -1,6 +1,12 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_URL || `http://localhost:${import.meta.env.VITE_BACKEND_PORT || 8080}/api`;
+// Read from the global window object injected at runtime via index.html
+const injectedUrl = window.RUNTIME_API_URL;
+const rawUrl = (injectedUrl && injectedUrl !== "__RUNTIME_API_URL__")
+  ? injectedUrl
+  : `https://financial-app-backend-600881932726.us-central1.run.app`;
+const API_BASE = rawUrl.endsWith('/api') ? rawUrl : `${rawUrl}/api`;
+export const BASE_URL = rawUrl;
 
 const api = axios.create({
   baseURL: API_BASE,

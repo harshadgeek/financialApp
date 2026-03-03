@@ -1,5 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import dotenv from 'dotenv'
+
+// Load environment variables from .env file or process
+dotenv.config()
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -7,9 +11,12 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: `http://localhost:${process.env.VITE_BACKEND_PORT || 8080}`,
+        target: `https://financial-app-backend-600881932726.us-central1.run.app`,
         changeOrigin: true,
       }
     }
+  },
+  define: {
+    'import.meta.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL)
   }
 })

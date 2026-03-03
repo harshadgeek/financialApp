@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, NavLink, Navigate, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { FiHome, FiCalendar, FiBarChart2, FiList, FiTarget, FiLogOut, FiRepeat, FiTrendingUp, FiRefreshCw, FiPlus, FiLock } from 'react-icons/fi';
-import { getUserProfile, uploadProfilePicture } from './api';
+import { getUserProfile, uploadProfilePicture, BASE_URL } from './api';
 import { useCurrency, CURRENCIES } from './context/CurrencyContext.jsx';
 import Dashboard from './pages/Dashboard';
 import WeeklyReport from './pages/WeeklyReport';
@@ -75,9 +75,7 @@ function Sidebar() {
     { to: '/budgets', icon: <FiTarget />, label: 'Budgets' },
   ];
 
-  const backendPort = import.meta.env.VITE_BACKEND_PORT || 8080;
-  const baseUrl = `http://localhost:${backendPort}`;
-  const avatarUrl = profile?.profilePictureUrl ? `${baseUrl}${profile.profilePictureUrl}` : null;
+  const avatarUrl = profile?.profilePictureUrl ? `${BASE_URL}${profile.profilePictureUrl}` : null;
 
   return (
     <aside className="sidebar">
@@ -181,6 +179,75 @@ function Sidebar() {
   );
 }
 
+function MobileNav() {
+  const navigate = useNavigate();
+  const [showMenu, setShowMenu] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('financeiq_token');
+    sessionStorage.removeItem('financeiq_username');
+    navigate('/login');
+  };
+
+  return (
+    <>
+      {showChangePassword && <ChangePasswordModal onClose={() => setShowChangePassword(false)} />}
+
+      {showMenu && (
+        <div style={{
+          position: 'fixed', bottom: 74, right: 16, background: 'var(--bg-secondary)',
+          border: '1px solid var(--border)', borderRadius: 'var(--radius-md)',
+          padding: '8px 0', zIndex: 1000, boxShadow: 'var(--shadow-lg)'
+        }}>
+          <button
+            onClick={() => { setShowMenu(false); setShowChangePassword(true); }}
+            style={{ display: 'block', width: '100%', padding: '12px 24px', background: 'none', border: 'none', color: 'var(--text-primary)', textAlign: 'left', fontSize: '0.9rem' }}
+          >
+            Change Password
+          </button>
+          <button
+            onClick={handleLogout}
+            style={{ display: 'block', width: '100%', padding: '12px 24px', background: 'none', border: 'none', color: 'var(--accent-red)', textAlign: 'left', fontSize: '0.9rem' }}
+          >
+            Logout
+          </button>
+        </div>
+      )}
+
+      {showMenu && (
+        <div
+          onClick={() => setShowMenu(false)}
+          style={{ position: 'fixed', inset: 0, zIndex: 999 }}
+        />
+      )}
+
+      <nav className="mobile-nav">
+        <NavLink to="/" end className={({ isActive }) => `mobile-nav-item${isActive ? ' active' : ''}`}>
+          <span className="nav-icon"><FiHome /></span>
+          Overview
+        </NavLink>
+        <NavLink to="/transactions" className={({ isActive }) => `mobile-nav-item${isActive ? ' active' : ''}`}>
+          <span className="nav-icon"><FiList /></span>
+          History
+        </NavLink>
+        <NavLink to="/budgets" className={({ isActive }) => `mobile-nav-item${isActive ? ' active' : ''}`}>
+          <span className="nav-icon"><FiTarget /></span>
+          Budgets
+        </NavLink>
+        <button
+          onClick={() => setShowMenu(!showMenu)}
+          className="mobile-nav-item"
+          style={{ background: 'none', border: 'none' }}
+        >
+          <span className="nav-icon"><FiLock /></span>
+          Menu
+        </button>
+      </nav>
+    </>
+  );
+}
+
 
 function MainLayout() {
   const [showQuickAdd, setShowQuickAdd] = useState(false);
@@ -199,6 +266,7 @@ function MainLayout() {
         }
       `}</style>
       <Sidebar />
+      <MobileNav />
       <div className="main-content">
         <div className="page-content">
           <Routes>
@@ -215,6 +283,7 @@ function MainLayout() {
 
       {/* Floating Action Button */}
       <button
+        className="fab-button"
         onClick={() => setShowQuickAdd(true)}
         title="Quick add transaction"
         style={{
@@ -225,7 +294,7 @@ function MainLayout() {
           boxShadow: '0 6px 24px rgba(79,142,247,0.45)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: '1.5rem', zIndex: 900,
-          transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+          transition: 'transform 0.15s ease, box-shadow 0.15s ease, bottom 0.2s ease, right 0.2s ease',
         }}
         onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(79,142,247,0.6)'; }}
         onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(79,142,247,0.45)'; }}
