@@ -25,6 +25,7 @@ DEPLOYMENT.md
 .env
 .env.local
 .env.*.local
+setup-secrets.bat
 
 # --- IDE & Editor Files ---
 .idea/
