@@ -24,7 +24,7 @@ public class DataSeederService implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         if (userRepository.count() == 0) {
             userRepository.save(User.builder()
                     .username("demo")

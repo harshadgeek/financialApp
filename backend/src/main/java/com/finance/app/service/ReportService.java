@@ -281,7 +281,7 @@ public class ReportService {
                 case YEARLY: return current.getMonth() == date.getMonth() && current.getDayOfMonth() == date.getDayOfMonth();
                 default: return false;
             }
-        } catch (RuntimeException e) {
+        } catch (java.time.DateTimeException e) {
             log.warn("Error checking execution for recurring tx: {}", rt.getId(), e);
             return false;
         }

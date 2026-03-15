@@ -114,7 +114,7 @@ public class RecurringTransactionService {
                 recurringTransactionRepository.save(rt);
 
                 count++;
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 log.error("Failed to process recurring transaction ID {}: {}", rt.getId(), e.getMessage());
             }
         }

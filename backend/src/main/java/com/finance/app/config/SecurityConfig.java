@@ -28,20 +28,24 @@ public class SecurityConfig {
     private final UserService userService;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/uploads/**").permitAll()
-                        .requestMatchers("/api/**").authenticated()
-                        .anyRequest().permitAll()
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider) {
+        try {
+            return http
+                    .csrf(AbstractHttpConfigurer::disable)
+                    .cors(Customizer.withDefaults())
+                    .authorizeHttpRequests(auth -> auth
+                            .requestMatchers("/api/auth/**").permitAll()
+                            .requestMatchers("/uploads/**").permitAll()
+                            .requestMatchers("/api/**").authenticated()
+                            .anyRequest().permitAll()
+                    )
+                    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .authenticationProvider(authenticationProvider)
+                    .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                    .build();
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to configure security filter chain", e);
+        }
     }
 
     @Bean
@@ -53,8 +57,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
+        try {
+            return config.getAuthenticationManager();
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to get authentication manager", e);
+        }
     }
 
 
