@@ -12,8 +12,8 @@ const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'Ju
 const CustomTooltip = ({ active, payload, label, fmt }) => {
     if (!active || !payload?.length) return null;
     return (
-        <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '12px 16px' }}>
-            <p style={{ color: '#94a3b8', marginBottom: 6, fontSize: 12 }}>{label}</p>
+        <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 16px', boxShadow: 'var(--shadow-lg)' }}>
+            <p style={{ color: 'var(--text-muted)', marginBottom: 6, fontSize: 12 }}>{label}</p>
             {payload.map((p, i) => (
                 <p key={i} style={{ color: p.color, fontWeight: 600, fontSize: 13 }}>{p.name}: {fmt(p.value)}</p>
             ))}
@@ -108,11 +108,11 @@ export default function MonthlyReport() {
                                         <stop offset="95%" stopColor="#f87171" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                <XAxis dataKey="day" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} label={{ value: 'Day of Month', position: 'insideBottom', offset: -2, fill: '#64748b', fontSize: 11 }} />
-                                <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={fmtAxis} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
+                                <XAxis dataKey="day" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} label={{ value: 'Day of Month', position: 'insideBottom', offset: -2, fill: 'var(--text-muted)', fontSize: 11 }} />
+                                <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={fmtAxis} />
                                 <Tooltip content={(props) => <CustomTooltip {...props} fmt={fmt} />} />
-                                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
+                                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, color: 'var(--text-muted)' }} />
                                 <Area type="monotone" dataKey="cumulativeIncome" stroke="#34d399" strokeWidth={2} fill="url(#gradCumInc)" name="Income" />
                                 <Area type="monotone" dataKey="cumulativeExpenses" stroke="#f87171" strokeWidth={2} fill="url(#gradCumExp)" name="Expenses" />
                             </AreaChart>
@@ -126,11 +126,11 @@ export default function MonthlyReport() {
                             <div className="chart-subtitle">Income and expenses per week</div>
                             <ResponsiveContainer width="100%" height={220}>
                                 <BarChart data={data.weeklyBreakdown} barGap={6} barCategoryGap="35%">
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                                    <XAxis dataKey="week" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
-                                    <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={fmtAxis} />
-                                    <Tooltip content={(props) => <CustomTooltip {...props} fmt={fmt} />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                                    <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} vertical={false} />
+                                    <XAxis dataKey="week" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
+                                    <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={fmtAxis} />
+                                    <Tooltip content={(props) => <CustomTooltip {...props} fmt={fmt} />} cursor={{ fill: 'var(--bg-card-hover)' }} />
+                                    <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, color: 'var(--text-muted)' }} />
                                     <Bar dataKey="income" fill="#34d399" radius={[4, 4, 0, 0]} name="Income" />
                                     <Bar dataKey="expenses" fill="#f87171" radius={[4, 4, 0, 0]} name="Expenses" />
                                 </BarChart>

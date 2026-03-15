@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route, NavLink, Navigate, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
-import { FiHome, FiCalendar, FiBarChart2, FiList, FiTarget, FiLogOut, FiRepeat, FiTrendingUp, FiRefreshCw, FiPlus, FiLock } from 'react-icons/fi';
+import { FiHome, FiCalendar, FiBarChart2, FiList, FiTarget, FiLogOut, FiRepeat, FiTrendingUp, FiRefreshCw, FiPlus, FiLock, FiSun, FiMoon } from 'react-icons/fi';
 import { getUserProfile, uploadProfilePicture, BASE_URL } from './api';
 import { useCurrency, CURRENCIES } from './context/CurrencyContext.jsx';
+import { useTheme } from './context/ThemeContext.jsx';
 import Dashboard from './pages/Dashboard';
 import WeeklyReport from './pages/WeeklyReport';
 import MonthlyReport from './pages/MonthlyReport';
@@ -28,6 +29,7 @@ function ProtectedRoute({ children }) {
 function Sidebar() {
   const navigate = useNavigate();
   const { currency, setCurrency, rate, rateLoading, rateError, lastUpdated, refreshRate } = useCurrency();
+  const { theme, toggleTheme } = useTheme();
   const fileInputRef = useRef(null);
   const [profile, setProfile] = useState(null);
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -167,6 +169,9 @@ function Sidebar() {
             <button onClick={() => setShowChangePassword(true)} title="Change Password" style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 8 }}>
               <FiLock size={16} />
             </button>
+            <button onClick={toggleTheme} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 8 }}>
+              {theme === 'dark' ? <FiSun size={16} /> : <FiMoon size={16} />}
+            </button>
             <button onClick={handleLogout} title="Logout" style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: 8 }}>
               <FiLogOut size={16} />
             </button>
@@ -181,6 +186,7 @@ function Sidebar() {
 
 function MobileNav() {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const [showMenu, setShowMenu] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
 
@@ -205,6 +211,12 @@ function MobileNav() {
             style={{ display: 'block', width: '100%', padding: '12px 24px', background: 'none', border: 'none', color: 'var(--text-primary)', textAlign: 'left', fontSize: '0.9rem' }}
           >
             Change Password
+          </button>
+          <button
+            onClick={() => { setShowMenu(false); toggleTheme(); }}
+            style={{ display: 'block', width: '100%', padding: '12px 24px', background: 'none', border: 'none', color: 'var(--text-primary)', textAlign: 'left', fontSize: '0.9rem' }}
+          >
+            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
           </button>
           <button
             onClick={handleLogout}

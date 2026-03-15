@@ -10,8 +10,8 @@ import { useCurrency } from '../context/CurrencyContext.jsx';
 const CustomTooltip = ({ active, payload, label, fmt }) => {
     if (!active || !payload?.length) return null;
     return (
-        <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '12px 16px' }}>
-            <p style={{ color: '#94a3b8', marginBottom: 6, fontSize: 12 }}>{label}</p>
+        <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 16px', boxShadow: 'var(--shadow-lg)' }}>
+            <p style={{ color: 'var(--text-muted)', marginBottom: 6, fontSize: 12 }}>{label}</p>
             {payload.map((p, i) => (
                 <p key={i} style={{ color: p.color, fontWeight: 600, fontSize: 13 }}>
                     {p.name}: {fmt(p.value)}
@@ -119,9 +119,9 @@ export default function Dashboard() {
                                     <stop offset="95%" stopColor="#f87171" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                            <XAxis dataKey="month" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
-                            <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={fmtAxis} />
+                            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
+                            <XAxis dataKey="month" tick={{ fill: 'var(--text-muted)', fontSize: 12 }} axisLine={false} tickLine={false} />
+                            <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={fmtAxis} />
                             <Tooltip content={(props) => <CustomTooltip {...props} fmt={fmt} />} />
                             <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
                             <Area type="monotone" dataKey="income" stroke="#34d399" strokeWidth={2} fill="url(#gradIncome)" name="Income" />
@@ -139,8 +139,12 @@ export default function Dashboard() {
                                 <Pie data={pieData} cx="50%" cy="45%" innerRadius={55} outerRadius={90} paddingAngle={3} dataKey="value">
                                     {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                                 </Pie>
-                                <Tooltip formatter={v => fmt(v)} contentStyle={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10 }} />
-                                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, color: '#94a3b8' }} />
+                                <Tooltip 
+                                    formatter={v => fmt(v)} 
+                                    contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 10, boxShadow: 'var(--shadow-lg)', color: 'var(--text-primary)' }} 
+                                    itemStyle={{ color: 'var(--text-primary)' }}
+                                />
+                                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, color: 'var(--text-muted)' }} />
                             </PieChart>
                         </ResponsiveContainer>
                     ) : (

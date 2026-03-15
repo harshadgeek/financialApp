@@ -34,6 +34,23 @@
   --transition: all 0.2s ease;
 }
 
+/* ─── Light Mode Overrides ──────────────────────────────────── */
+.light-mode {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --border: #e2e8f0;
+  --border-light: #cbd5e1;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.08);
+}
+
 /* ─── Reset ────────────────────────────────────────────────── */
 *,
 *::before,
@@ -466,7 +483,7 @@ textarea {
 .data-table td {
   padding: 12px 12px;
   font-size: 0.87rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--border);
 }
 
 .data-table tr:hover td {
@@ -589,7 +606,7 @@ textarea {
 .form-input,
 .form-select {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
@@ -613,7 +630,7 @@ textarea {
 /* ─── Progress Bars ─────────────────────────────────────────── */
 .progress-bar-track {
   height: 8px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--bg-card-hover);
   border-radius: 4px;
   overflow: hidden;
   margin-top: 8px;

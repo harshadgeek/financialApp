@@ -3,11 +3,14 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
 import { CurrencyProvider } from './context/CurrencyContext.jsx';
+import { ThemeProvider } from './context/ThemeContext.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <CurrencyProvider>
-      <App />
-    </CurrencyProvider>
+    <ThemeProvider>
+      <CurrencyProvider>
+        <App />
+      </CurrencyProvider>
+    </ThemeProvider>
   </React.StrictMode>
 );
