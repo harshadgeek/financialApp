@@ -37,6 +37,10 @@ export default function QuickAddModal({ onClose, onAdded }) {
             {/* Backdrop */}
             <div
                 onClick={onClose}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClose(); }}
+                role="button"
+                tabIndex={0}
+                aria-label="Close modal"
                 style={{
                     position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)',
                     backdropFilter: 'blur(4px)', zIndex: 999

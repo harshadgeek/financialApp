@@ -77,7 +77,14 @@ export default function ChangePasswordModal({ onClose }) {
 
     return (
         <>
-            <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)', zIndex: 999 }} />
+            <div
+                onClick={onClose}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClose(); }}
+                role="button"
+                tabIndex={0}
+                aria-label="Close modal"
+                style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)', zIndex: 999 }}
+            />
             <div style={{
                 position: 'fixed', top: '50%', left: '50%',
                 transform: 'translate(-50%, -50%)',
