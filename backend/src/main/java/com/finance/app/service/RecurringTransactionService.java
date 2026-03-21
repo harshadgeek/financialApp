@@ -8,6 +8,7 @@ import com.finance.app.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +41,7 @@ public class RecurringTransactionService {
         RecurringTransaction existing = recurringTransactionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Not found"));
         if (!existing.getUsername().equals(username)) {
-            throw new SecurityException("Unauthorized");
+            throw new AccessDeniedException("Unauthorized");
         }
         
         // Merge fields
@@ -67,7 +68,7 @@ public class RecurringTransactionService {
         RecurringTransaction tx = recurringTransactionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Not found"));
         if (!tx.getUsername().equals(username)) {
-            throw new SecurityException("Unauthorized");
+            throw new AccessDeniedException("Unauthorized");
         }
         recurringTransactionRepository.deleteById(id);
     }

@@ -1,19 +1,20 @@
 package com.finance.app.service;
+
 import com.finance.app.model.Category;
 import com.finance.app.model.Transaction;
 import com.finance.app.model.TransactionType;
 import com.finance.app.model.User;
 import com.finance.app.repository.TransactionRepository;
 import com.finance.app.repository.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +43,7 @@ public class DataSeederService implements CommandLineRunner {
 
     private void seedTransactions() {
         LocalDate today = LocalDate.now();
-        Random rnd = new Random(42);
+        SecureRandom rnd = new SecureRandom();
 
         // Seed 6 months of data
         for (int monthsBack = 5; monthsBack >= 0; monthsBack--) {

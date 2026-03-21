@@ -347,7 +347,7 @@ export default function Transactions() {
                                         timeString = new Intl.DateTimeFormat(navigator.language, {
                                             hour: 'numeric', minute: 'numeric'
                                         }).format(new Date(tx.createdAt));
-                                    } catch (e) { }
+                                    } catch (_e) { /* ignore invalid date format */ }
                                 }
 
                                 return (

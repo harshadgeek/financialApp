@@ -4,6 +4,7 @@ import com.finance.app.model.Transaction;
 import com.finance.app.model.TransactionType;
 import com.finance.app.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public class TransactionService {
     public Transaction updateTransaction(String id, Transaction transaction, String username) {
         Transaction existing = getById(id);
         if (!existing.getUsername().equals(username)) {
-            throw new SecurityException("Unauthorized");
+            throw new AccessDeniedException("Unauthorized");
         }
         existing.setAmount(transaction.getAmount());
         existing.setCategory(transaction.getCategory());
@@ -38,7 +39,7 @@ public class TransactionService {
     public void deleteTransaction(String id, String username) {
         Transaction tx = getById(id);
         if (!tx.getUsername().equals(username)) {
-            throw new SecurityException("Unauthorized");
+            throw new AccessDeniedException("Unauthorized");
         }
         transactionRepository.deleteById(id);
     }

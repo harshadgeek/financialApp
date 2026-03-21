@@ -16,8 +16,11 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    // 256-bit secret key for HMAC-SHA256
-    private final SecretKey key = Keys.hmacShaKeyFor("FinanceAppSuperSecretKeyForJwtGeneration2024".getBytes());
+    private final SecretKey key;
+
+    public JwtUtil(@Value("${jwt.secret}") String secret) {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -40,7 +43,7 @@ public class JwtUtil {
                 .getPayload();
     }
 
-    private Boolean isTokenExpired(String token) {
+    private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
@@ -54,12 +57,12 @@ public class JwtUtil {
                 .claims(claims)
                 .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
+                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 10)) // 10 hours
                 .signWith(key)
                 .compact();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
+    public boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }

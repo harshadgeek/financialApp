@@ -204,7 +204,7 @@ public class ReportService {
         // 2. Projections
         List<RecurringTransaction> actives = recurringTransactionRepository.findAllByUsername(username).stream()
                 .filter(rt -> rt != null && rt.isActive() && rt.getAmount() != null && rt.getFrequency() != null)
-                .collect(Collectors.toList());
+                .toList();
 
         log.debug("Found {} active recurring transactions for {}", actives.size(), username);
 
@@ -247,10 +247,8 @@ public class ReportService {
         }
 
         // Add final point if not already there
-        if (trend.get(trend.size()-1).getDate().equals(targetDate.toString())) {
-             // already added
-        } else {
-             trend.add(new FutureProjectionDto.ProjectedDataPointDto(targetDate.toString(), runningBalance, BigDecimal.ZERO, BigDecimal.ZERO));
+        if (!trend.get(trend.size() - 1).getDate().equals(targetDate.toString())) {
+            trend.add(new FutureProjectionDto.ProjectedDataPointDto(targetDate.toString(), runningBalance, BigDecimal.ZERO, BigDecimal.ZERO));
         }
 
         return new FutureProjectionDto(
@@ -273,14 +271,13 @@ public class ReportService {
         
         // To avoid infinite loops or heavy computation, we use logic based on frequency
         try {
-            switch (rt.getFrequency()) {
-                case DAILY: return true;
-                case WEEKLY: return current.getDayOfWeek() == date.getDayOfWeek();
-                case MONTHLY: return current.getDayOfMonth() == date.getDayOfMonth() || 
-                                    (date.getDayOfMonth() == date.lengthOfMonth() && current.getDayOfMonth() > date.lengthOfMonth());
-                case YEARLY: return current.getMonth() == date.getMonth() && current.getDayOfMonth() == date.getDayOfMonth();
-                default: return false;
-            }
+            return switch (rt.getFrequency()) {
+                case DAILY -> true;
+                case WEEKLY -> current.getDayOfWeek() == date.getDayOfWeek();
+                case MONTHLY -> current.getDayOfMonth() == date.getDayOfMonth() ||
+                        (date.getDayOfMonth() == date.lengthOfMonth() && current.getDayOfMonth() > date.lengthOfMonth());
+                case YEARLY -> current.getMonth() == date.getMonth() && current.getDayOfMonth() == date.getDayOfMonth();
+            };
         } catch (java.time.DateTimeException e) {
             log.warn("Error checking execution for recurring tx: {}", rt.getId(), e);
             return false;

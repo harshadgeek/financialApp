@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -76,7 +77,7 @@ public class UserController {
 
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(
-            @RequestBody java.util.Map<String, String> body,
+            @RequestBody Map<String, String> body,
             Authentication authentication) {
         try {
             userService.changePassword(
