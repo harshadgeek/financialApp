@@ -144,6 +144,9 @@ function Sidebar() {
             <div
               className="user-avatar"
               onClick={onAvatarClick}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onAvatarClick(); }}
+              role="button"
+              tabIndex={0}
               style={{ cursor: 'pointer', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               title="Click to change profile picture"
             >
@@ -191,8 +194,7 @@ function MobileNav() {
   const [showChangePassword, setShowChangePassword] = useState(false);
 
   const handleLogout = () => {
-    sessionStorage.removeItem('financeiq_token');
-    sessionStorage.removeItem('financeiq_username');
+    ['financeiq_token', 'financeiq_username'].forEach(k => sessionStorage.removeItem(k));
     navigate('/login');
   };
 
@@ -230,30 +232,30 @@ function MobileNav() {
       {showMenu && (
         <div
           onClick={() => setShowMenu(false)}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setShowMenu(false); }}
+          role="button"
+          tabIndex={0}
+          aria-label="Close menu"
           style={{ position: 'fixed', inset: 0, zIndex: 999 }}
         />
       )}
 
       <nav className="mobile-nav">
         <NavLink to="/" end className={({ isActive }) => `mobile-nav-item${isActive ? ' active' : ''}`}>
-          <span className="nav-icon"><FiHome /></span>
-          Overview
+          <span className="nav-icon"><FiHome /></span> Overview
         </NavLink>
         <NavLink to="/transactions" className={({ isActive }) => `mobile-nav-item${isActive ? ' active' : ''}`}>
-          <span className="nav-icon"><FiList /></span>
-          History
+          <span className="nav-icon"><FiList /></span> History
         </NavLink>
         <NavLink to="/budgets" className={({ isActive }) => `mobile-nav-item${isActive ? ' active' : ''}`}>
-          <span className="nav-icon"><FiTarget /></span>
-          Budgets
+          <span className="nav-icon"><FiTarget /></span> Budgets
         </NavLink>
         <button
           onClick={() => setShowMenu(!showMenu)}
           className="mobile-nav-item"
           style={{ background: 'none', border: 'none' }}
         >
-          <span className="nav-icon"><FiLock /></span>
-          Menu
+          <span className="nav-icon"><FiLock /></span> Menu
         </button>
       </nav>
     </>
