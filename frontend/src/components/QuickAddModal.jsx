@@ -75,33 +75,34 @@ export default function QuickAddModal({ onClose, onAdded }) {
                 ) : (
                     <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                         <div className="form-group">
-                            <label className="form-label">Amount (₹)</label>
+                            <label htmlFor="txn-amount" className="form-label">Amount (₹)</label>
                             <input
+                                id="txn-amount"
                                 className="form-input" autoFocus type="number" step="0.01" min="0" placeholder="0.00"
                                 value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} required
                             />
                         </div>
                         <div className="form-group">
-                            <label className="form-label">Type</label>
-                            <select className="form-select" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
+                            <label htmlFor="txn-type" className="form-label">Type</label>
+                            <select id="txn-type" className="form-select" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
                                 <option value="INCOME">Income</option>
                                 <option value="EXPENSE">Expense</option>
                             </select>
                         </div>
                         <div className="form-group">
-                            <label className="form-label">Category</label>
-                            <select className="form-select" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
+                            <label htmlFor="txn-category" className="form-label">Category</label>
+                            <select id="txn-category" className="form-select" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
                                 {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
                         </div>
                         <div className="form-group">
-                            <label className="form-label">Date</label>
-                            <input className="form-input" type="date" value={form.date}
+                            <label htmlFor="txn-date" className="form-label">Date</label>
+                            <input id="txn-date" className="form-input" type="date" value={form.date}
                                 onChange={e => setForm(f => ({ ...f, date: e.target.value }))} required />
                         </div>
                         <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                            <label className="form-label">Description</label>
-                            <input className="form-input" type="text" placeholder="What was this for?"
+                            <label htmlFor="txn-desc" className="form-label">Description</label>
+                            <input id="txn-desc" className="form-input" type="text" placeholder="What was this for?"
                                 value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
                         </div>
                         <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 4 }}>

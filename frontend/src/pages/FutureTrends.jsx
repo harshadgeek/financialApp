@@ -34,8 +34,9 @@ export default function FutureTrends() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(255,255,255,0.03)', padding: '8px 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }}>
                     <FiCalendar style={{ color: 'var(--primary)' }} />
-                    <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Forecast Until:</span>
+                    <label htmlFor="forecast-date" style={{ fontSize: '0.9rem', fontWeight: 500 }}>Forecast Until:</label>
                     <input
+                        id="forecast-date"
                         type="date"
                         value={targetDate}
                         onChange={e => setTargetDate(e.target.value)}

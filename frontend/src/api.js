@@ -4,7 +4,9 @@ import axios from 'axios';
 const injectedUrl = window.RUNTIME_API_URL;
 const rawUrl = (injectedUrl && injectedUrl !== "__RUNTIME_API_URL__")
   ? injectedUrl
-  : `https://financial-app-backend-600881932726.us-central1.run.app`;
+  : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:8080'
+    : `https://financial-app-backend-600881932726.us-central1.run.app`;
 const API_BASE = rawUrl.endsWith('/api') ? rawUrl : `${rawUrl}/api`;
 export const BASE_URL = rawUrl;
 

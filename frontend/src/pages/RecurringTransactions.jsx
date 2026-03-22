@@ -87,49 +87,49 @@ export default function RecurringTransactions() {
                     <div className="chart-title" style={{ marginBottom: 20 }}>{editingId ? '✏️ Edit Recurring Transaction' : '➕ New Recurring Transaction'}</div>
                     <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                         <div className="form-group">
-                            <label className="form-label">Amount ({symbol})</label>
-                            <input className="form-input" type="number" step="0.01" min="0" placeholder="0.00" value={form.amount}
+                            <label className="form-label" htmlFor="recur-amount">Amount ({symbol})</label>
+                            <input id="recur-amount" className="form-input" type="number" step="0.01" min="0" placeholder="0.00" value={form.amount}
                                 onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} required />
                         </div>
                         <div className="form-group">
-                            <label className="form-label">Type</label>
-                            <select className="form-select" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
+                            <label className="form-label" htmlFor="recur-type">Type</label>
+                            <select id="recur-type" className="form-select" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
                                 <option value="INCOME">Income</option>
                                 <option value="EXPENSE">Expense</option>
                             </select>
                         </div>
                         <div className="form-group">
-                            <label className="form-label">Category</label>
-                            <select className="form-select" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
+                            <label className="form-label" htmlFor="recur-category">Category</label>
+                            <select id="recur-category" className="form-select" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
                                 {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
                         </div>
                         <div className="form-group">
-                            <label className="form-label">Frequency</label>
-                            <select className="form-select" value={form.frequency} onChange={e => setForm(f => ({ ...f, frequency: e.target.value }))}>
+                            <label className="form-label" htmlFor="recur-frequency">Frequency</label>
+                            <select id="recur-frequency" className="form-select" value={form.frequency} onChange={e => setForm(f => ({ ...f, frequency: e.target.value }))}>
                                 {FREQUENCIES.map(f => <option key={f} value={f}>{f}</option>)}
                             </select>
                         </div>
                         <div className="form-group">
-                            <label className="form-label">Start Date</label>
-                            <input className="form-input" type="date" value={form.startDate}
+                            <label className="form-label" htmlFor="recur-start">Start Date</label>
+                            <input id="recur-start" className="form-input" type="date" value={form.startDate}
                                 onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))} required />
                         </div>
                         <div className="form-group">
-                            <label className="form-label">End Date (Optional)</label>
-                            <input className="form-input" type="date" value={form.endDate}
+                            <label className="form-label" htmlFor="recur-end">End Date (Optional)</label>
+                            <input id="recur-end" className="form-input" type="date" value={form.endDate}
                                 onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))} />
                         </div>
                         <div className="form-group" style={{ gridColumn: 'span 1' }}>
-                            <label className="form-label">Active</label>
+                            <label className="form-label" htmlFor="recur-active">Active</label>
                             <div style={{ paddingTop: 10 }}>
-                                <input type="checkbox" checked={form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} />
+                                <input id="recur-active" type="checkbox" checked={form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} />
                                 <span style={{ marginLeft: 8 }}>Enabled</span>
                             </div>
                         </div>
                         <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                            <label className="form-label">Description</label>
-                            <input className="form-input" type="text" placeholder="What is this for?" value={form.description}
+                            <label className="form-label" htmlFor="recur-desc">Description</label>
+                            <input id="recur-desc" className="form-input" type="text" placeholder="What is this for?" value={form.description}
                                 onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
                         </div>
                         <div style={{ gridColumn: 'span 3', display: 'flex', justifyContent: 'flex-end', gap: 10 }}>

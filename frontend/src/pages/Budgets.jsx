@@ -71,14 +71,15 @@ export default function Budgets() {
                 <div className="chart-title" style={{ marginBottom: 18 }}>🎯 Set a Monthly Budget</div>
                 <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
                     <div className="form-group" style={{ flex: '1 1 180px' }}>
-                        <label className="form-label">Category</label>
-                        <select className="form-select" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
+                        <label className="form-label" htmlFor="budget-category">Category</label>
+                        <select id="budget-category" className="form-select" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
                             {CATEGORIES.map(c => <option key={c} value={c}>{CAT_ICONS[c]} {c}</option>)}
                         </select>
                     </div>
                     <div className="form-group" style={{ flex: '1 1 200px' }}>
-                        <label className="form-label">Monthly Limit (₹)</label>
+                        <label className="form-label" htmlFor="budget-limit">Monthly Limit (₹)</label>
                         <input
+                            id="budget-limit"
                             className="form-input"
                             type="number" min="1" step="1" placeholder="e.g. 5000"
                             value={form.monthlyLimit}

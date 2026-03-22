@@ -43,28 +43,28 @@ export default function SignUp() {
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                     <div className="form-group">
-                        <label className="form-label">Username</label>
+                        <label className="form-label" htmlFor="username">Username</label>
                         <div style={{ position: 'relative' }}>
                             <FiUser style={{ position: 'absolute', top: 12, left: 14, color: 'var(--text-secondary)' }} />
-                            <input className="form-input" style={{ paddingLeft: 40 }} required minLength={3}
+                            <input id="username" className="form-input" style={{ paddingLeft: 40 }} required minLength={3}
                                 value={form.username} onChange={e => setForm({ ...form, username: e.target.value })} />
                         </div>
                     </div>
 
                     <div className="form-group">
-                        <label className="form-label">Email</label>
+                        <label className="form-label" htmlFor="email">Email</label>
                         <div style={{ position: 'relative' }}>
                             <FiMail style={{ position: 'absolute', top: 12, left: 14, color: 'var(--text-secondary)' }} />
-                            <input className="form-input" type="email" style={{ paddingLeft: 40 }} required
+                            <input id="email" className="form-input" type="email" style={{ paddingLeft: 40 }} required
                                 value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
                         </div>
                     </div>
 
                     <div className="form-group">
-                        <label className="form-label">Password</label>
+                        <label className="form-label" htmlFor="password">Password</label>
                         <div style={{ position: 'relative' }}>
                             <FiLock style={{ position: 'absolute', top: 12, left: 14, color: 'var(--text-secondary)' }} />
-                            <input className="form-input" type="password" style={{ paddingLeft: 40 }} required minLength={6}
+                            <input id="password" className="form-input" type="password" style={{ paddingLeft: 40 }} required minLength={6}
                                 value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
                         </div>
                     </div>

@@ -233,31 +233,31 @@ export default function Transactions() {
                     <div className="chart-title" style={{ marginBottom: 20 }}>{editingId ? '✏️ Edit Transaction' : '➕ New Transaction'}</div>
                     <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                         <div className="form-group">
-                            <label className="form-label">Amount (₹)</label>
-                            <input className="form-input" type="number" step="0.01" min="0" placeholder="0.00" value={form.amount}
+                            <label className="form-label" htmlFor="tx-amount">Amount (₹)</label>
+                            <input id="tx-amount" className="form-input" type="number" step="0.01" min="0" placeholder="0.00" value={form.amount}
                                 onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} required />
                         </div>
                         <div className="form-group">
-                            <label className="form-label">Type</label>
-                            <select className="form-select" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
+                            <label className="form-label" htmlFor="tx-type">Type</label>
+                            <select id="tx-type" className="form-select" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
                                 <option value="INCOME">Income</option>
                                 <option value="EXPENSE">Expense</option>
                             </select>
                         </div>
                         <div className="form-group">
-                            <label className="form-label">Category</label>
-                            <select className="form-select" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
+                            <label className="form-label" htmlFor="tx-category">Category</label>
+                            <select id="tx-category" className="form-select" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
                                 {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
                         </div>
                         <div className="form-group">
-                            <label className="form-label">Date</label>
-                            <input className="form-input" type="date" value={form.date}
+                            <label className="form-label" htmlFor="tx-date">Date</label>
+                            <input id="tx-date" className="form-input" type="date" value={form.date}
                                 onChange={e => setForm(f => ({ ...f, date: e.target.value }))} required />
                         </div>
                         <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                            <label className="form-label">Description</label>
-                            <input className="form-input" type="text" placeholder="What was this for?" value={form.description}
+                            <label className="form-label" htmlFor="tx-desc">Description</label>
+                            <input id="tx-desc" className="form-input" type="text" placeholder="What was this for?" value={form.description}
                                 onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
                         </div>
                         <div style={{ gridColumn: 'span 3', display: 'flex', justifyContent: 'flex-end', gap: 10 }}>

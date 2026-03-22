@@ -323,16 +323,14 @@ function MainLayout() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<SignIn />} />
-        <Route path="/register" element={<SignUp />} />
-        <Route path="/*" element={
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
-        } />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/login" element={<SignIn />} />
+      <Route path="/register" element={<SignUp />} />
+      <Route path="/*" element={
+        <ProtectedRoute>
+          <MainLayout />
+        </ProtectedRoute>
+      } />
+    </Routes>
   );
 }
