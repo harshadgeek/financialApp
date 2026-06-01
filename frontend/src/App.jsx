@@ -13,6 +13,7 @@ import FutureTrends from './pages/FutureTrends';
 import Budgets from './pages/Budgets';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
+import ForgotPassword from './pages/ForgotPassword';
 import QuickAddModal from './components/QuickAddModal';
 import ChangePasswordModal from './components/ChangePasswordModal';
 
@@ -326,6 +327,7 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<SignIn />} />
       <Route path="/register" element={<SignUp />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/*" element={
         <ProtectedRoute>
           <MainLayout />

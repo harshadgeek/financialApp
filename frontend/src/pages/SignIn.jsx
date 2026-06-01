@@ -73,7 +73,10 @@ export default function SignIn() {
                     </div>
 
                     <div className="form-group">
-                        <label className="form-label" htmlFor="password">Password</label>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                            <label className="form-label" htmlFor="password" style={{ marginBottom: 0 }}>Password</label>
+                            <Link to="/forgot-password" style={{ fontSize: 12, color: 'var(--accent)', textDecoration: 'none', fontWeight: 500 }}>Forgot password?</Link>
+                        </div>
                         <div style={{ position: 'relative' }}>
                             <FiLock style={{ position: 'absolute', top: 12, left: 14, color: 'var(--text-secondary)' }} />
                             <input id="password" className="form-input" type="password" style={{ paddingLeft: 40 }} required

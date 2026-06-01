@@ -11,11 +11,13 @@ dist/
 dist-ssr/
 
 # --- Logs ---
-backend/backend-output.txt
-logs/
-*.log
+**/backend-output.txt
+**/logs.json
+**/logs.txt
+**/logs/
+**/*.log
 npm-debug.log*
-get-logs.bat
+**/get-logs.bat
 
 # --- Google Cloud ---
 .gcloudignore
@@ -25,7 +27,8 @@ DEPLOYMENT.md
 .env
 .env.local
 .env.*.local
-setup-secrets.bat
+**/setup-secrets.bat
+**/setup-mail-secrets.bat
 
 # --- IDE & Editor Files ---
 .idea/

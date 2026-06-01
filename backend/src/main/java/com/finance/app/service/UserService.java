@@ -21,6 +21,7 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private static final String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{6,}$";
 
     public User registerUser(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username())) {
@@ -28,6 +29,10 @@ public class UserService implements UserDetailsService {
         }
         if (userRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Error: Email is already in use!");
+        }
+        if (!request.password().matches(passwordPattern)) {
+            throw new IllegalArgumentException(
+                    "Password must be at least 6 characters and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
         }
 
         User user = User.builder()
@@ -43,12 +48,11 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-                
+
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
-                Collections.emptyList()
-        );
+                Collections.emptyList());
     }
 
     public UserDto getProfile(String username) {
@@ -71,8 +75,28 @@ public class UserService implements UserDetailsService {
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
             throw new IllegalArgumentException("Current password is incorrect.");
         }
-        if (newPassword.length() < 6) {
-            throw new IllegalArgumentException("New password must be at least 6 characters.");
+
+        // Check if the new password matches those rules
+        if (!newPassword.matches(passwordPattern)) {
+            throw new IllegalArgumentException(
+                    "Password must be at least 6 characters and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public void resetPassword(String email, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+
+        if (!newPassword.matches(passwordPattern)) {
+            throw new IllegalArgumentException(
+                    "Password must be at least 6 characters and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
