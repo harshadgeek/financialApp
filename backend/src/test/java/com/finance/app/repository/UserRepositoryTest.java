@@ -18,15 +18,16 @@ class UserRepositoryTest {
     @Test
     void findByUsername_ReturnsUser() {
         String uniqueUsername = "testuser_" + System.currentTimeMillis();
+        String uniqueEmail = "test_" + System.currentTimeMillis() + "@example.com";
         User user = new User();
         user.setUsername(uniqueUsername);
-        user.setEmail("test@example.com");
+        user.setEmail(uniqueEmail);
         user.setPassword("password");
         userRepository.save(user);
 
         Optional<User> found = userRepository.findByUsername(uniqueUsername);
         assertTrue(found.isPresent());
-        assertEquals("test@example.com", found.get().getEmail());
+        assertEquals(uniqueEmail, found.get().getEmail());
         
         userRepository.delete(user);
     }
