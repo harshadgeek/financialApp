@@ -15,6 +15,10 @@ repositories {
     mavenCentral()
 }
 
+dependencyLocking {
+    lockAllConfigurations()
+}
+
 val jjwtVersion = "0.12.5"
 
 dependencies {
