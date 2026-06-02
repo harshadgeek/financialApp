@@ -54,15 +54,17 @@ export function CurrencyProvider({ children }) {
     }, [currency, fetchRate]);
 
     const setCurrency = (code) => {
-        localStorage.setItem('financeiq_currency', code);
-        setCurrencyState(code);
+        if (CURRENCIES[code]) {
+            localStorage.setItem('financeiq_currency', code);
+            setCurrencyState(code);
+        }
     };
 
     // Convert a value from INR to current currency and format it
     const fmt = useCallback((inrValue) => {
         const meta = CURRENCIES[currency] || CURRENCIES.INR;
         const converted = Number(inrValue) * rate;
-        const decimals = currency === 'JPY' ? 0 : 0; // JPY has no decimals
+        const decimals = currency === 'JPY' ? 0 : 2; // JPY has no decimals
         return `${meta.symbol}${converted.toLocaleString(meta.locale, {
             minimumFractionDigits: decimals,
             maximumFractionDigits: decimals,

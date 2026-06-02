@@ -40,13 +40,13 @@ export const getMonthlyReport = (month, year) => api.get('/reports/monthly', { p
 
 export const getTransactions = () => api.get('/transactions').then(r => r.data);
 export const addTransaction = (txn) => api.post('/transactions', txn).then(r => r.data);
-export const updateTransaction = (id, txn) => api.put(`/transactions/${id}`, txn).then(r => r.data);
-export const deleteTransaction = (id) => api.delete(`/transactions/${id}`);
+export const updateTransaction = (id, txn) => api.put(`/transactions/${encodeURIComponent(id)}`, txn).then(r => r.data);
+export const deleteTransaction = (id) => api.delete(`/transactions/${encodeURIComponent(id)}`);
 
 export const getRecurringTransactions = () => api.get('/recurring-transactions').then(r => r.data);
 export const addRecurringTransaction = (txn) => api.post('/recurring-transactions', txn).then(r => r.data);
-export const updateRecurringTransaction = (id, txn) => api.put(`/recurring-transactions/${id}`, txn).then(r => r.data);
-export const deleteRecurringTransaction = (id) => api.delete(`/recurring-transactions/${id}`);
+export const updateRecurringTransaction = (id, txn) => api.put(`/recurring-transactions/${encodeURIComponent(id)}`, txn).then(r => r.data);
+export const deleteRecurringTransaction = (id) => api.delete(`/recurring-transactions/${encodeURIComponent(id)}`);
 
 export const getFutureProjection = (targetDate) => api.get('/reports/future-projection', { params: { targetDate } }).then(r => r.data);
 
@@ -59,7 +59,7 @@ export const uploadProfilePicture = (formData) => api.post('/users/profile-pictu
 // Budgets
 export const getBudgets = () => api.get('/budgets').then(r => r.data);
 export const upsertBudget = (category, monthlyLimit) => api.post('/budgets', { category, monthlyLimit }).then(r => r.data);
-export const deleteBudget = (category) => api.delete(`/budgets/${category}`);
+export const deleteBudget = (category) => api.delete(`/budgets/${encodeURIComponent(category)}`);
 export const getBudgetStatus = (month, year) => api.get('/budgets/status', { params: { month, year } }).then(r => r.data);
 
 // Account
