@@ -1,7 +1,6 @@
 package com.finance.app.service;
 
 import com.finance.app.model.Transaction;
-import com.finance.app.model.TransactionType;
 import com.finance.app.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;

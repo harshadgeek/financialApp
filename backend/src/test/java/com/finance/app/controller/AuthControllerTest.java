@@ -1,9 +1,7 @@
 package com.finance.app.controller;
 
 import com.finance.app.dto.AuthRequest;
-import com.finance.app.dto.AuthResponse;
 import com.finance.app.dto.RegisterRequest;
-import com.finance.app.security.JwtFilter;
 import com.finance.app.security.JwtUtil;
 import com.finance.app.service.UserService;
 import com.finance.app.service.OtpService;
@@ -14,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -47,8 +44,10 @@ class AuthControllerTest {
     @MockBean
     private OtpService otpService;
 
-    // JwtFilter and AuthenticationProvider are removed from @MockBean as per instruction
-    // They will be provided by the Spring context or mocked implicitly if not needed for the test scope.
+    // JwtFilter and AuthenticationProvider are removed from @MockBean as per
+    // instruction
+    // They will be provided by the Spring context or mocked implicitly if not
+    // needed for the test scope.
 
     @MockBean
     private PasswordEncoder passwordEncoder;
@@ -187,7 +186,8 @@ class AuthControllerTest {
     @Test
     void resetPassword_ServiceThrowsException_ReturnsBadRequest() throws Exception {
         when(otpService.verifyOtp("test@example.com", "123456")).thenReturn(true);
-        doThrow(new IllegalArgumentException("Invalid password complexity")).when(userService).resetPassword("test@example.com", "short");
+        doThrow(new IllegalArgumentException("Invalid password complexity")).when(userService)
+                .resetPassword("test@example.com", "short");
 
         mockMvc.perform(post("/api/auth/reset-password")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -199,7 +199,8 @@ class AuthControllerTest {
     @Test
     void resetPassword_DatabaseError_ReturnsGenericBadRequest() throws Exception {
         when(otpService.verifyOtp("test@example.com", "123456")).thenReturn(true);
-        doThrow(new RuntimeException("Database error")).when(userService).resetPassword("test@example.com", "NewP@ss123");
+        doThrow(new RuntimeException("Database error")).when(userService).resetPassword("test@example.com",
+                "NewP@ss123");
 
         mockMvc.perform(post("/api/auth/reset-password")
                 .contentType(MediaType.APPLICATION_JSON)

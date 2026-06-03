@@ -33,7 +33,6 @@ class TransactionServiceTest {
     private TransactionService transactionService;
 
     private Transaction tx1;
-    private Transaction tx2;
 
     @BeforeEach
     void setUp() {
@@ -44,17 +43,6 @@ class TransactionServiceTest {
                 .type(TransactionType.INCOME)
                 .category(Category.SALARY)
                 .description("Monthly salary")
-                .date(LocalDate.now())
-                .createdAt(Instant.now())
-                .build();
-
-        tx2 = Transaction.builder()
-                .id("2")
-                .username("otheruser")
-                .amount(new BigDecimal("50.00"))
-                .type(TransactionType.EXPENSE)
-                .category(Category.FOOD)
-                .description("Lunch")
                 .date(LocalDate.now())
                 .createdAt(Instant.now())
                 .build();
@@ -108,8 +96,7 @@ class TransactionServiceTest {
     void updateTransaction_Unauthorized_ThrowsException() {
         when(transactionRepository.findById("1")).thenReturn(Optional.of(tx1));
 
-        assertThrows(AccessDeniedException.class, () -> 
-            transactionService.updateTransaction("1", tx1, "wronguser"));
+        assertThrows(AccessDeniedException.class, () -> transactionService.updateTransaction("1", tx1, "wronguser"));
         verify(transactionRepository, never()).save(any(Transaction.class));
     }
 
@@ -126,8 +113,7 @@ class TransactionServiceTest {
     void deleteTransaction_Unauthorized_ThrowsException() {
         when(transactionRepository.findById("1")).thenReturn(Optional.of(tx1));
 
-        assertThrows(AccessDeniedException.class, () -> 
-            transactionService.deleteTransaction("1", "wronguser"));
+        assertThrows(AccessDeniedException.class, () -> transactionService.deleteTransaction("1", "wronguser"));
         verify(transactionRepository, never()).deleteById(anyString());
     }
 
