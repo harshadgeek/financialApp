@@ -1,6 +1,5 @@
 package com.finance.app.controller;
 
-import com.finance.app.dto.AuthRequest;
 import com.finance.app.dto.RegisterRequest;
 import com.finance.app.security.JwtUtil;
 import com.finance.app.service.UserService;
@@ -54,7 +53,6 @@ class AuthControllerTest {
 
     @Test
     void register_Success_ReturnsAuthResponse() throws Exception {
-        RegisterRequest request = new RegisterRequest("testuser", "test@example.com", "password");
         UserDetails userDetails = new User("testuser", "password", Collections.emptyList());
 
         when(userService.registerUser(any(RegisterRequest.class))).thenReturn(null);
@@ -71,7 +69,6 @@ class AuthControllerTest {
 
     @Test
     void login_Success_ReturnsAuthResponse() throws Exception {
-        AuthRequest request = new AuthRequest("testuser", "password");
         UserDetails userDetails = new User("testuser", "password", Collections.emptyList());
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(null);
