@@ -4,7 +4,7 @@ import com.finance.app.model.Transaction;
 import com.finance.app.model.TransactionType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.data.mongodb.test.autoconfigure.DataMongoTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,7 +29,7 @@ class TransactionRepositoryTest {
 
         List<Transaction> found = transactionRepository.findAllByUsernameOrderByDateDescCreatedAtDesc("testuser");
         assertFalse(found.isEmpty());
-        assertEquals(new BigDecimal("100.0"), found.get(0).getAmount());
+        assertEquals(new BigDecimal("100.0"), found.getFirst().getAmount());
 
         transactionRepository.delete(t);
     }

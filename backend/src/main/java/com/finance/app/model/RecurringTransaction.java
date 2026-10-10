@@ -29,8 +29,18 @@ public class RecurringTransaction {
     private LocalDate startDate;
     private LocalDate endDate;
     private LocalDate nextExecutionDate;
-    private boolean active;
+    
+    @Builder.Default
+    private Boolean active = true;
     
     @org.springframework.data.mongodb.core.index.Indexed
     private String username;
+
+    public boolean isActive() {
+        return Boolean.TRUE.equals(active);
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active == null || active;
+    }
 }
